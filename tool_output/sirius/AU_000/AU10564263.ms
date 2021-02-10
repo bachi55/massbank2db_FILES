@@ -1,0 +1,19 @@
+>compound AU10564263
+>parentmass 152.0021
+>ionization [M-H]-
+>formula C6H4ClN3
+>rt 382.740000
+>profile qtof
+#smiles_iso C1=CC2=NNN=C2C=C1Cl
+#smiles_can C1=CC2=NNN=C2C=C1Cl
+#inchikey PZBQVZFITSVHAW-UHFFFAOYSA-N
+#pubchem_id 66760
+#mb_accession AU230862
+
+>ms2
+88.018100 7376.000000
+116.024000 456.000000
+152.002700 28296.000000
+153.005200 2072.000000
+153.999600 5444.000000
+

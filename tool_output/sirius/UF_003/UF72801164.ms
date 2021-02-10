@@ -1,0 +1,20 @@
+>compound UF72801164
+>parentmass 252.1417
+>ionization [M+H]+
+>formula C14H21NOS
+>rt 1623.780000
+>profile orbitrap
+#smiles_iso CCCN(CCC)C(=O)SCC1=CC=CC=C1
+#smiles_can CCCN(CCC)C(=O)SCC1=CC=CC=C1
+#inchikey NQLVQOSNDJXLKG-UHFFFAOYSA-N
+#pubchem_id 62020
+#mb_accession UF406301,UF406302
+
+>ms2
+86.059800 10282.700000
+91.054100 7184226.500000
+128.106900 14817.400000
+
+>ms2
+91.054100 8469025.000000
+

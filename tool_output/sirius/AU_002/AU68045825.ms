@@ -1,0 +1,23 @@
+>compound AU68045825
+>parentmass 141.0771
+>ionization [M+H]+
+>formula C5H8N4O
+>rt 212.480000
+>profile qtof
+#smiles_iso CC1=NC(=NC(=N1)OC)N
+#smiles_can CC1=NC(=NC(=N1)OC)N
+#inchikey NXFQWRWXEYTOTK-UHFFFAOYSA-N
+#pubchem_id 15466
+#mb_accession AU200401,AU200402,AU200403
+
+>ms2
+121.038300 1108.000000
+141.076200 199532.000000
+
+>ms2
+121.037800 404.000000
+141.076200 34252.000000
+
+>ms2
+141.077400 1964.000000
+

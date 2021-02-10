@@ -1,0 +1,19 @@
+>compound SM61654492
+>parentmass 422.8195
+>ionization [M-H]-
+>formula C13H8Br2Cl2O2
+>rt 824.880000
+>profile orbitrap
+#smiles_iso C1=C(C=C(C(=C1CC2=C(C(=CC(=C2)Cl)Br)O)O)Br)Cl
+#smiles_can C1=C(C=C(C(=C1CC2=C(C(=CC(=C2)Cl)Br)O)O)Br)Cl
+#inchikey TYBHZVUFOINFDV-UHFFFAOYSA-N
+#pubchem_id 84907
+#mb_accession SM864952
+
+>ms2
+124.979400 28977.200000
+204.906100 7087019.500000
+342.893200 228262.100000
+386.843200 21103.100000
+422.819700 4836965.500000
+

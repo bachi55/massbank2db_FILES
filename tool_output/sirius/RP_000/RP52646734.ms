@@ -1,0 +1,23 @@
+>compound RP52646734
+>parentmass 487.2371
+>ionization [M-H]-
+>formula C24H40O8S
+>rt 242.940000
+>profile qtof
+#smiles_iso C[C@H](CCC(=O)O)[C@H]1CC[C@@H]2[C@@]1([C@H](C[C@H]3[C@H]2[C@@H](C[C@H]4[C@@]3(CC[C@H](C4)O)C)OS(=O)(=O)O)O)C
+#smiles_can CC(CCC(=O)O)C1CCC2C1(C(CC3C2C(CC4C3(CCC(C4)O)C)OS(=O)(=O)O)O)C
+#inchikey RRVLNNMINXAIKC-OELDTZBJSA-N
+#pubchem_id 459070
+#mb_accession RP029311,RP029312,RP029313
+
+>ms2
+487.237000 183562.000000
+
+>ms2
+487.236800 196322.000000
+
+>ms2
+79.957800 356.000000
+96.960300 54244.000000
+487.236700 166180.000000
+

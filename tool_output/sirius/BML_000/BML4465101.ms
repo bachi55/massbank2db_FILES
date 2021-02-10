@@ -1,0 +1,19 @@
+>compound BML4465101
+>parentmass 225.0881
+>ionization [M-H]-
+>formula C10H14N2O4
+>rt 157.500000
+>profile qtof
+#smiles_iso CC1=CN(C(=O)NC1=O)C2CCC(O2)CO
+#smiles_can CC1=CN(C(=O)NC1=O)C2CCC(O2)CO
+#inchikey XKKCQTLDIPIRQD-UHFFFAOYSA-N
+#pubchem_id 5280
+#mb_accession BML01404
+
+>ms2
+150.729800 29.000000
+155.720700 61.000000
+207.915600 22.000000
+217.181900 29.000000
+225.087700 1135.000000
+

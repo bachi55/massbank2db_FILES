@@ -1,0 +1,24 @@
+>compound LU95447816
+>parentmass 255.233
+>ionization [M-H]-
+>formula C16H32O2
+>rt 1295.220000
+>profile orbitrap
+#smiles_iso CCCCCCCCC(CCCCCC)C(=O)O
+#smiles_can CCCCCCCCC(CCCCCC)C(=O)O
+#inchikey JMOLZNNXZPAGBH-UHFFFAOYSA-N
+#pubchem_id 32912
+#mb_accession LU091751,LU091752,LU091753,LU091754
+
+>ms2
+255.233000 2904946.500000
+
+>ms2
+255.233000 4069886.500000
+
+>ms2
+255.233000 218435.500000
+
+>ms2
+255.233800 7776.800000
+

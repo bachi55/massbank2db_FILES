@@ -1,0 +1,20 @@
+>compound SM35689311
+>parentmass 512.96
+>ionization [M-H]-
+>formula C10HF19O2
+>rt 996.180000
+>profile orbitrap
+#smiles_iso C(=O)(C(C(C(C(C(C(C(C(C(F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)O
+#smiles_can C(=O)(C(C(C(C(C(C(C(C(C(F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)O
+#inchikey PCIUEQPBYFRTEM-UHFFFAOYSA-N
+#pubchem_id 9555
+#mb_accession SM876951
+
+>ms2
+168.989400 3860767.000000
+196.984200 137274.100000
+218.986200 5900840.000000
+268.983100 5020737.000000
+318.979500 782788.600000
+468.970100 16139342.000000
+

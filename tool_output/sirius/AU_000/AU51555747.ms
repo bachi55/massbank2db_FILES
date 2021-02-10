@@ -1,0 +1,20 @@
+>compound AU51555747
+>parentmass 267.0906
+>ionization [M-H]-
+>formula C13H17ClN2O2
+>rt 413.010000
+>profile qtof
+#smiles_iso C1COCCN1CCNC(=O)C2=CC=C(C=C2)Cl
+#smiles_can C1COCCN1CCNC(=O)C2=CC=C(C=C2)Cl
+#inchikey YHXISWVBGDMDLQ-UHFFFAOYSA-N
+#pubchem_id 4235
+#mb_accession AU227957,AU227958
+
+>ms2
+267.090600 1612.000000
+269.088100 352.000000
+
+>ms2
+154.006700 368.000000
+267.090200 664.000000
+

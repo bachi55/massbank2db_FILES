@@ -1,0 +1,20 @@
+>compound SM66520572
+>parentmass 74.0964
+>ionization [M+H]+
+>formula C4H11N
+>rt 24.000000
+>profile orbitrap
+#smiles_iso CCCCN
+#smiles_can CCCCN
+#inchikey HQABUPZFAYXKJW-UHFFFAOYSA-N
+#pubchem_id 8007
+#mb_accession SM817603
+
+>ms2
+53.002400 101004.200000
+53.997700 27326.600000
+55.054400 20987.500000
+56.049600 17936.300000
+57.070000 7107015.000000
+74.096500 3088866.500000
+

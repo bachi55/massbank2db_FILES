@@ -1,0 +1,18 @@
+>compound SM70556988
+>parentmass 223.9706
+>ionization [M+H]+
+>formula C9H6BrNO
+>rt 537.840000
+>profile orbitrap
+#smiles_iso C1=CC2=C(C=CC(=O)N2)C=C1Br
+#smiles_can C1=CC2=C(C=CC(=O)N2)C=C1Br
+#inchikey YLAFBGATSQRSTB-UHFFFAOYSA-N
+#pubchem_id 12378943
+#mb_accession SM834202
+
+>ms2
+127.041800 200218.700000
+145.052400 83813.300000
+205.960200 1504175.000000
+223.970800 14417138.000000
+

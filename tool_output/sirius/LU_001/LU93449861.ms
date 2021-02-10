@@ -1,0 +1,22 @@
+>compound LU93449861
+>parentmass 158.1176
+>ionization [M+H]+
+>formula C8H15NO2
+>rt 1680.120000
+>profile orbitrap
+#smiles_iso CC(C)COCNC(=O)C=C
+#smiles_can CC(C)COCNC(=O)C=C
+#inchikey KCTMTGOHHMRJHZ-UHFFFAOYSA-N
+#pubchem_id 27979
+#mb_accession LU097504,LU097506
+
+>ms2
+57.069900 13504.600000
+58.065100 33894.200000
+85.064600 6013.000000
+
+>ms2
+57.069900 8667.600000
+58.065100 44293.200000
+85.064800 6106.200000
+

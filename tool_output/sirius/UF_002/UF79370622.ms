@@ -1,0 +1,20 @@
+>compound UF79370622
+>parentmass 255.0838
+>ionization [M+H]+
+>formula C16H14OS
+>rt 1690.800000
+>profile orbitrap
+#smiles_iso CC(C)C1=C2C(=CC=C1)SC3=CC=CC=C3C2=O
+#smiles_can CC(C)C1=C2C(=CC=C1)SC3=CC=CC=C3C2=O
+#inchikey YIKSHDNOAYSSPX-UHFFFAOYSA-N
+#pubchem_id 9795026
+#mb_accession UF418103,UF418104
+
+>ms2
+213.037700 5747.600000
+214.041200 75859.600000
+
+>ms2
+213.037500 4901.200000
+214.041100 70482.100000
+

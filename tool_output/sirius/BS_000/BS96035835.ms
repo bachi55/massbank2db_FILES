@@ -1,0 +1,17 @@
+>compound BS96035835
+>parentmass 1067.544
+>ionization [M-H]-
+>formula C54H84O21
+>rt 1143.600000
+>profile qtof
+#smiles_iso C[C@H]1[C@@H]([C@H]([C@H]([C@@H](O1)O[C@@H]2[C@H]([C@H]([C@H](O[C@H]2O[C@@H]3[C@H]([C@@H]([C@H](O[C@H]3O[C@H]4CC[C@]5(C([C@@]4(C)CO)CC[C@@]6(C5CC=C7[C@]6(CC[C@@]8([C@H]7CC(C[C@H]8OC9CC(=O)C(=C(O9)C)O)(C)C)C)C)C)C)C(=O)O)O)O)CO)O)O)O)O)O
+#smiles_can CC1C(C(C(C(O1)OC2C(C(C(OC2OC3C(C(C(OC3OC4CCC5(C(C4(C)CO)CCC6(C5CC=C7C6(CCC8(C7CC(CC8OC9CC(=O)C(=C(O9)C)O)(C)C)C)C)C)C)C(=O)O)O)O)CO)O)O)O)O)O
+#inchikey ONAAMCDHQSWPDU-NVXZJFILSA-N
+#pubchem_id 134755720
+#mb_accession BS001108
+
+>ms2
+1067.540000 999.000000
+1068.547000 561.000000
+1069.553000 190.000000
+

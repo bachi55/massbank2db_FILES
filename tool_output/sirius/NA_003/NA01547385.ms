@@ -1,0 +1,24 @@
+>compound NA01547385
+>parentmass 577.3371
+>ionization [M+H]+
+>formula C32H48O9
+>rt 706.800000
+>profile orbitrap
+#smiles_iso C[C@H]1[C@@H]([C@H](C[C@@H](O1)O[C@H]2CC[C@]3([C@@H](C2)CC[C@@H]4[C@@H]3CC[C@]5([C@@]4(C[C@@H]([C@@H]5C6=CC(=O)OC6)OC(=O)C)O)C)C)OC)O
+#smiles_can CC1C(C(CC(O1)OC2CCC3(C(C2)CCC4C3CCC5(C4(CC(C5C6=CC(=O)OC6)OC(=O)C)O)C)C)OC)O
+#inchikey JLPDBLFIVFSOCC-XYXFTTADSA-N
+#pubchem_id 11541511
+#mb_accession NA002307,NA002308,NA002702,NA002703
+
+>ms2
+522.094300 2847.600000
+
+>ms2
+522.093200 1619.000000
+
+>ms2
+522.094400 1194.200000
+
+>ms2
+522.095000 1093.500000
+

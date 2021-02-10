@@ -1,0 +1,19 @@
+>compound BS82078007
+>parentmass 564.329
+>ionization [M+HCOO]-
+>formula C26H50NO7P
+>rt 1397.400000
+>profile qtof
+#smiles_iso CCCCC/C=C\C/C=C\CCCCCCCC(=O)OC[C@H](COP(=O)([O-])OCC[N+](C)(C)C)O
+#smiles_can CCCCCC=CCC=CCCCCCCCC(=O)OCC(COP(=O)([O-])OCC[N+](C)(C)C)O
+#inchikey SPJFYYJXNPEZDW-FTJOPAKQSA-N
+#pubchem_id 11005824
+#mb_accession BS001057
+
+>ms2
+224.069000 124.000000
+242.080000 25.000000
+279.234000 999.000000
+280.237000 171.000000
+504.312000 35.000000
+

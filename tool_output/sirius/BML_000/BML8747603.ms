@@ -1,0 +1,20 @@
+>compound BML8747603
+>parentmass 178.0509
+>ionization [M-H]-
+>formula C9H9NO3
+>rt 139.620000
+>profile qtof
+#smiles_iso C1=CC=C(C=C1)C(=O)NCC(=O)O
+#smiles_can C1=CC=C(C=C1)C(=O)NCC(=O)O
+#inchikey QIAFMBKCNZACKA-UHFFFAOYSA-N
+#pubchem_id 464
+#mb_accession BML01204
+
+>ms2
+122.591400 21.000000
+134.061800 734.000000
+134.094300 44.000000
+147.103000 30.000000
+164.069400 52.000000
+178.049900 613.000000
+

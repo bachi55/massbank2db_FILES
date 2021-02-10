@@ -1,0 +1,21 @@
+>compound PR65065433
+>parentmass 203.1395
+>ionization [M+H]+
+>formula C9H18N2O3
+>rt 121.200000
+>profile qtof
+#smiles_iso CC(C)CC(C(=O)NC(C)C(=O)O)N
+#smiles_can CC(C)CC(C(=O)NC(C)C(=O)O)N
+#inchikey HSQGMTRYSIHDAC-UHFFFAOYSA-N
+#pubchem_id 259321
+#mb_accession PR311066
+
+>ms2
+70.029250 22.000000
+86.096950 224.000000
+96.960960 17.000000
+145.928910 21.000000
+176.143080 18.000000
+203.106140 20.000000
+203.144010 17.000000
+

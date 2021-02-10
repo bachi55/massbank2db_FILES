@@ -1,0 +1,23 @@
+>compound RP85021598
+>parentmass 341.1089
+>ionization [M-H]-
+>formula C12H22O11
+>rt 34.680000
+>profile qtof
+#smiles_iso C([C@@H]1[C@H]([C@@H]([C@H]([C@@H](O1)OC[C@@H]2[C@H]([C@@H]([C@H]([C@@H](O2)O)O)O)O)O)O)O)O
+#smiles_can C(C1C(C(C(C(O1)OCC2C(C(C(C(O2)O)O)O)O)O)O)O)O
+#inchikey DLRVVLDZNNYCBX-LIZSDCNHSA-N
+#pubchem_id 441422
+#mb_accession RP023212,RP023213
+
+>ms2
+59.014200 48.000000
+89.024300 152.000000
+179.056400 54.000000
+
+>ms2
+85.029900 52.000000
+89.027100 42.000000
+113.027000 32.000000
+298.102800 28.000000
+

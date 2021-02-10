@@ -1,0 +1,19 @@
+>compound PR07064236
+>parentmass 203.0788
+>ionization [M-H]-
+>formula C11H12N2O2
+>rt 168.000000
+>profile qtof
+#smiles_iso C1=CC=C2C(=C1)C(=CN2)CC(C(=O)O)N
+#smiles_can C1=CC=C2C(=C1)C(=CN2)CC(C(=O)O)N
+#inchikey QIVBCDIJIAJPQS-UHFFFAOYSA-N
+#pubchem_id 1148
+#mb_accession PR309197
+
+>ms2
+74.023410 70.000000
+99.917540 26.000000
+116.049800 143.000000
+159.095520 24.000000
+203.081540 329.000000
+

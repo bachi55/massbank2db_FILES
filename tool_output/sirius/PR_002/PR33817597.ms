@@ -1,0 +1,19 @@
+>compound PR33817597
+>parentmass 203.1112
+>ionization [M-H2O+H]+
+>formula C10H20O3S
+>rt 265.800000
+>profile qtof
+#smiles_iso CS(=O)CCCCCCCCC(=O)O
+#smiles_can CS(=O)CCCCCCCCC(=O)O
+#inchikey XZYIQKMSOAQJCG-UHFFFAOYSA-N
+#pubchem_id 121232646
+#mb_accession PR310888
+
+>ms2
+97.065410 19.000000
+111.114920 18.000000
+120.090770 24.000000
+130.068560 28.000000
+203.113170 150.000000
+

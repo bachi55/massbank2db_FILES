@@ -1,0 +1,20 @@
+>compound EA29474744
+>parentmass 376.0381
+>ionization [M+H]+
+>formula C15H16Cl3N3O2
+>rt 732.000000
+>profile orbitrap
+#smiles_iso CCCN(CCOC1=C(C=C(C=C1Cl)Cl)Cl)C(=O)N2C=CN=C2
+#smiles_can CCCN(CCOC1=C(C=C(C=C1Cl)Cl)Cl)C(=O)N2C=CN=C2
+#inchikey TVLSRXXIMLFWEO-UHFFFAOYSA-N
+#pubchem_id 73665
+#mb_accession EA009601,EA009614
+
+>ms2
+265.953200 7272.800000
+308.000600 917591.700000
+
+>ms2
+265.953300 15221.800000
+308.000400 1485337.600000
+

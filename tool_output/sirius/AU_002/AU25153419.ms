@@ -1,0 +1,21 @@
+>compound AU25153419
+>parentmass 376.9859
+>ionization [M+H]+
+>formula C13H18Br2N2O
+>rt 759.180000
+>profile qtof
+#smiles_iso C1CC(CCC1NCC2=C(C(=CC(=C2)Br)Br)N)O
+#smiles_can C1CC(CCC1NCC2=C(C(=CC(=C2)Br)Br)N)O
+#inchikey JBDGDEWWOUBZPM-UHFFFAOYSA-N
+#pubchem_id 2132
+#mb_accession AU251102,AU251104
+
+>ms2
+165.068000 360.000000
+
+>ms2
+123.022700 404.000000
+165.070000 1892.000000
+166.073300 404.000000
+180.080800 1076.000000
+

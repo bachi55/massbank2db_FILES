@@ -1,0 +1,23 @@
+>compound LU35882854
+>parentmass 283.1176
+>ionization [M+H]+
+>formula C14H18O6
+>rt 895.620000
+>profile orbitrap
+#smiles_iso COCCOC(=O)C1=CC=CC=C1C(=O)OCCOC
+#smiles_can COCCOC(=O)C1=CC=CC=C1C(=O)OCCOC
+#inchikey HSUIVCLOAAJSRE-UHFFFAOYSA-N
+#pubchem_id 8344
+#mb_accession LU039701,LU039702,LU039703
+
+>ms2
+59.049200 4683.900000
+283.116100 4466.900000
+
+>ms2
+59.049200 4819.700000
+283.117200 1685.200000
+
+>ms2
+59.049300 5413.200000
+

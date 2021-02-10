@@ -1,0 +1,20 @@
+>compound EA99608050
+>parentmass 270.0806
+>ionization [M-H]-
+>formula C12H17NO4S
+>rt 432.000000
+>profile orbitrap
+#smiles_iso CC1=CSC(=C1N(C(C)COC)C(=O)C(=O)O)C
+#smiles_can CC1=CSC(=C1N(C(C)COC)C(=O)C(=O)O)C
+#inchikey HOYCASTVMCEOTP-UHFFFAOYSA-N
+#pubchem_id 86290064
+#mb_accession EA025951,EA025964
+
+>ms2
+166.069500 211678.700000
+198.095900 16340650.200000
+
+>ms2
+166.069400 44207.000000
+198.095900 5622610.900000
+

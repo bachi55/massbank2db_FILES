@@ -1,0 +1,19 @@
+>compound BML2121006
+>parentmass 305.0656
+>ionization [M+H]+
+>formula C15H12O7
+>rt 259.320000
+>profile qtof
+#smiles_iso C1=CC(=C(C=C1C2C(C(=O)C3=C(C=C(C=C3O2)O)O)O)O)O
+#smiles_can C1=CC(=C(C=C1C2C(C(=O)C3=C(C=C(C=C3O2)O)O)O)O)O
+#inchikey CXQWRCVTCMQVQX-UHFFFAOYSA-N
+#pubchem_id 471
+#mb_accession BML01255
+
+>ms2
+149.020600 31.000000
+153.018500 64.000000
+231.062900 40.000000
+259.058300 81.000000
+305.058000 22.000000
+

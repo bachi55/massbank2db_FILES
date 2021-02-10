@@ -1,0 +1,22 @@
+>compound KW60751882
+>parentmass 120.05559999999998
+>ionization [M+H]+
+>formula C6H5N3
+>rt 427.440000
+>profile orbitrap
+#smiles_iso C1=CC2=NNN=C2C=C1
+#smiles_can C1=CC2=NNN=C2C=C1
+#inchikey QRUDEWIWKLJBPS-UHFFFAOYSA-N
+#pubchem_id 7220
+#mb_accession KW107802,KW107803,KW107804
+
+>ms2
+120.055600 5371536.000000
+
+>ms2
+120.055600 3533395.000000
+
+>ms2
+92.049400 41948.800000
+127.048500 18051.200000
+

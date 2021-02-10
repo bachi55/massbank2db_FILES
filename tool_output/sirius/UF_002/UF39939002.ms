@@ -1,0 +1,23 @@
+>compound UF39939002
+>parentmass 282.1448
+>ionization [M+H]+
+>formula C13H19N3O4
+>rt 1677.240000
+>profile orbitrap
+#smiles_iso CCC(CC)NC1=C(C=C(C(=C1[N+](=O)[O-])C)C)[N+](=O)[O-]
+#smiles_can CCC(CC)NC1=C(C=C(C(=C1[N+](=O)[O-])C)C)[N+](=O)[O-]
+#inchikey CHIFOSRWCNZCFN-UHFFFAOYSA-N
+#pubchem_id 38479
+#mb_accession UF405903,UF405904
+
+>ms2
+188.107600 2494.700000
+194.056000 5570.900000
+212.066500 1759603.800000
+266.020000 4153.700000
+
+>ms2
+194.056200 9966.900000
+212.066600 1692356.500000
+266.019300 3267.300000
+

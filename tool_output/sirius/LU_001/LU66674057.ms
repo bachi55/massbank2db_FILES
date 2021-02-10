@@ -1,0 +1,20 @@
+>compound LU66674057
+>parentmass 359.1489
+>ionization [M+H]+
+>formula C20H22O6
+>rt 1082.040000
+>profile orbitrap
+#smiles_iso C1=CC=C(C=C1)C(=O)OCCOCCOCCOC(=O)C2=CC=CC=C2
+#smiles_can C1=CC=C(C=C1)C(=O)OCCOCCOCCOC(=O)C2=CC=CC=C2
+#inchikey AHSGHEXYEABOKT-UHFFFAOYSA-N
+#pubchem_id 67123
+#mb_accession LU037101,LU037103
+
+>ms2
+105.033300 3644.900000
+149.059900 227302.400000
+
+>ms2
+105.033600 83249.700000
+149.059800 131438.200000
+

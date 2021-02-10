@@ -1,0 +1,18 @@
+>compound BML0302194
+>parentmass 403.2479
+>ionization [M+H]+
+>formula C24H34O5
+>rt 490.200000
+>profile qtof
+#smiles_iso CC(CCC(=O)O)C1CCC2C1(C(=O)CC3C2C(=O)CC4C3(CCC(=O)C4)C)C
+#smiles_can CC(CCC(=O)O)C1CCC2C1(C(=O)CC3C2C(=O)CC4C3(CCC(=O)C4)C)C
+#inchikey OHXPGWPVLFPUSM-UHFFFAOYSA-N
+#pubchem_id 2975
+#mb_accession BML01316
+
+>ms2
+339.233500 22.000000
+349.212700 25.000000
+367.222000 76.000000
+385.236100 71.000000
+

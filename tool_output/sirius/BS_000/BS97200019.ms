@@ -1,0 +1,17 @@
+>compound BS97200019
+>parentmass 476.277
+>ionization [M-H]-
+>formula C23H44NO7P
+>rt 1389.600000
+>profile qtof
+#smiles_iso CCCCC/C=C\C/C=C\CCCCCCCC(=O)OC[C@H](COP(=O)(O)OCCN)O
+#smiles_can CCCCCC=CCC=CCCCCCCCC(=O)OCC(COP(=O)(O)OCCN)O
+#inchikey DBHKHNGBVGWQJE-USWSLJGRSA-N
+#pubchem_id 52925130
+#mb_accession BS001058
+
+>ms2
+196.037000 65.000000
+279.232000 999.000000
+280.235000 206.000000
+

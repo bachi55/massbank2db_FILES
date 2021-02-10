@@ -1,0 +1,22 @@
+>compound AU68932129
+>parentmass 230.011
+>ionization [M+Na]+
+>formula C8H11Cl2NO
+>rt 90.210000
+>profile qtof
+#smiles_iso C=CCN(CC=C)C(=O)C(Cl)Cl
+#smiles_can C=CCN(CC=C)C(=O)C(Cl)Cl
+#inchikey YRMLFORXOOIJDR-UHFFFAOYSA-N
+#pubchem_id 37829
+#mb_accession AU383330,AU383331
+
+>ms2
+170.971800 328.000000
+198.965900 1776.000000
+200.963500 344.000000
+230.007800 516.000000
+
+>ms2
+124.981100 724.000000
+170.969900 424.000000
+

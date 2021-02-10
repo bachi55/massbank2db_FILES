@@ -1,0 +1,21 @@
+>compound UF60218813
+>parentmass 120.0556
+>ionization [M+H]+
+>formula C6H5N3
+>rt 988.680000
+>profile orbitrap
+#smiles_iso C1=CC2=NNN=C2C=C1
+#smiles_can C1=CC2=NNN=C2C=C1
+#inchikey QRUDEWIWKLJBPS-UHFFFAOYSA-N
+#pubchem_id 7220
+#mb_accession UF417703,UF417704
+
+>ms2
+65.038600 3430.900000
+92.049600 13055.100000
+120.055900 29665.700000
+
+>ms2
+65.038600 4638.300000
+92.049700 16992.200000
+

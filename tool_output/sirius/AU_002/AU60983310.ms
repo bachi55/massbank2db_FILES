@@ -1,0 +1,21 @@
+>compound AU60983310
+>parentmass 381.1672
+>ionization [M+Na]+
+>formula C21H26O5
+>rt 428.130000
+>profile qtof
+#smiles_iso C[C@]12CC(=O)[C@H]3[C@H]([C@@H]1CC[C@@]2(C(=O)CO)O)CCC4=CC(=O)C=C[C@]34C
+#smiles_can CC12CC(=O)C3C(C1CCC2(C(=O)CO)O)CCC4=CC(=O)C=CC34C
+#inchikey XOFYZVNMUHMLCC-ZPOLXVRWSA-N
+#pubchem_id 5865
+#mb_accession AU219630,AU219631
+
+>ms2
+381.171000 10056.000000
+382.174400 2636.000000
+
+>ms2
+250.086400 356.000000
+381.170300 5392.000000
+382.172200 1184.000000
+

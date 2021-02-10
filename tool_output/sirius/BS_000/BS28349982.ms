@@ -1,0 +1,18 @@
+>compound BS28349982
+>parentmass 633.4006
+>ionization [M-H]-
+>formula C36H58O9
+>rt 1165.800000
+>profile qtof
+#smiles_iso C[C@@]12CC[C@@]3(C(=CCC4[C@]3(CCC5[C@@]4(CC[C@@H]([C@]5(C)CO)O[C@H]6[C@@H]([C@H]([C@@H]([C@H](O6)C(=O)O)O)O)O)C)C)[C@@H]1CC(C[C@H]2O)(C)C)C
+#smiles_can CC1(CC2C3=CCC4C5(CCC(C(C5CCC4(C3(CCC2(C(C1)O)C)C)C)(C)CO)OC6C(C(C(C(O6)C(=O)O)O)O)O)C)C
+#inchikey NARQRJFIZNOSJV-JMMGJMLBSA-N
+#pubchem_id 51136552
+#mb_accession BS001111
+
+>ms2
+113.023700 135.000000
+633.400600 999.000000
+634.402500 368.000000
+635.406600 90.000000
+

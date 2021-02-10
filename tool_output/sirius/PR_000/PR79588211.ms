@@ -1,0 +1,19 @@
+>compound PR79588211
+>parentmass 321.1546
+>ionization [M-H]-
+>formula C14H26O8
+>rt 287.400000
+>profile qtof
+#smiles_iso CCCCOC(=O)CC(C)OC1C(C(C(C(O1)CO)O)O)O
+#smiles_can CCCCOC(=O)CC(C)OC1C(C(C(C(O1)CO)O)O)O
+#inchikey YUPCLHHTUNDMAN-UHFFFAOYSA-N
+#pubchem_id 76463851
+#mb_accession PR309337
+
+>ms2
+159.102140 96.000000
+160.096760 17.000000
+204.116940 16.000000
+253.037540 17.000000
+321.155430 259.000000
+

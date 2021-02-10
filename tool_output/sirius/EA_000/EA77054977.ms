@@ -1,0 +1,20 @@
+>compound EA77054977
+>parentmass 250.1085
+>ionization [M-H]-
+>formula C13H17NO4
+>rt 378.000000
+>profile orbitrap
+#smiles_iso CC1=C(C(=CC=C1)C)N(CCOC)C(=O)C(=O)O
+#smiles_can CC1=C(C(=CC=C1)C)N(CCOC)C(=O)C(=O)O
+#inchikey MHGMSAFPNAKIRZ-UHFFFAOYSA-N
+#pubchem_id 86290105
+#mb_accession EA253651,EA253664
+
+>ms2
+146.098000 37439.300000
+178.124000 15252216.500000
+
+>ms2
+146.097600 4889.500000
+178.123900 3329840.600000
+

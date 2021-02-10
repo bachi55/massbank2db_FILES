@@ -1,0 +1,19 @@
+>compound SM44003694
+>parentmass 194.0459
+>ionization [M-H]-
+>formula C9H9NO4
+>rt 232.140000
+>profile orbitrap
+#smiles_iso CC(=O)NC1=CC(=C(C=C1)O)C(=O)O
+#smiles_can CC(=O)NC1=CC(=C(C=C1)O)C(=O)O
+#inchikey GEFDRROBUCULOD-UHFFFAOYSA-N
+#pubchem_id 65512
+#mb_accession SM862251
+
+>ms2
+132.045400 35312.400000
+134.024500 13102.400000
+149.048300 17510.400000
+150.056000 5876752.500000
+194.045900 2169411.200000
+

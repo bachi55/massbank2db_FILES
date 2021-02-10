@@ -1,0 +1,18 @@
+>compound PR52394537
+>parentmass 283.0679
+>ionization [M-H]-
+>formula C10H12N4O6
+>rt 125.400000
+>profile qtof
+#smiles_iso C1=NC2=C(N1C3C(C(C(O3)CO)O)O)NC(=O)NC2=O
+#smiles_can C1=NC2=C(N1C3C(C(C(O3)CO)O)O)NC(=O)NC2=O
+#inchikey UBORTCNDUKBEOP-UHFFFAOYSA-N
+#pubchem_id 1189
+#mb_accession PR309133
+
+>ms2
+108.016790 69.000000
+151.024860 947.000000
+152.026980 17.000000
+283.065640 248.000000
+

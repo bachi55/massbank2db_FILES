@@ -1,0 +1,20 @@
+>compound BS44748467
+>parentmass 255.0668
+>ionization [M-H]-
+>formula C15H12O4
+>rt 670.200000
+>profile qtof
+#smiles_iso C1=CC(=CC=C1/C=C/C(=O)C2=C(C=C(C=C2)O)O)O
+#smiles_can C1=CC(=CC=C1C=CC(=O)C2=C(C=C(C=C2)O)O)O
+#inchikey DXDRHHKMWQZJHT-FPYGCLRLSA-N
+#pubchem_id 638278
+#mb_accession BS003260
+
+>ms2
+119.050900 999.000000
+120.053900 61.000000
+135.008800 702.000000
+136.011700 34.000000
+153.019000 37.000000
+255.066800 145.000000
+

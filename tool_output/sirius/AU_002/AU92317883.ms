@@ -1,0 +1,23 @@
+>compound AU92317883
+>parentmass 115.0324
+>ionization [M+H]+
+>formula C4H6N2S
+>rt 151.120000
+>profile qtof
+#smiles_iso CN1C=CNC1=S
+#smiles_can CN1C=CNC1=S
+#inchikey PMRYVIKBURPHAH-UHFFFAOYSA-N
+#pubchem_id 1349907
+#mb_accession AU116602,AU116603,AU116606
+
+>ms2
+115.033400 6556.000000
+
+>ms2
+115.031700 532.000000
+
+>ms2
+115.033400 39940.000000
+116.036500 2808.000000
+117.029300 2596.000000
+

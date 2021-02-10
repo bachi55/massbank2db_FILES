@@ -1,0 +1,18 @@
+>compound BML9013465
+>parentmass 376.2483
+>ionization [M+H]+
+>formula C22H33NO4
+>rt 233.700000
+>profile qtof
+#smiles_iso CCC1C2CCCCN3C2C(CC3C4CC(C(=O)O4)C)C5C1OC(=O)C5C
+#smiles_can CCC1C2CCCCN3C2C(CC3C4CC(C(=O)O4)C)C5C1OC(=O)C5C
+#inchikey GYOGHROCTSEKDY-UHFFFAOYSA-N
+#pubchem_id 435242
+#mb_accession BML00866,BML00875
+
+>ms2
+376.246200 390.000000
+
+>ms2
+376.244400 317.000000
+

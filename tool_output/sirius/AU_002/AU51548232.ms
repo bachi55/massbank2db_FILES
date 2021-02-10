@@ -1,0 +1,18 @@
+>compound AU51548232
+>parentmass 749.5158
+>ionization [M+H]+
+>formula C38H72N2O12
+>rt 337.980000
+>profile qtof
+#smiles_iso CCC1C(C(C(N(CC(CC(C(C(C(C(C(=O)O1)C)OC2CC(C(C(O2)C)O)(C)OC)C)OC3C(C(CC(O3)C)N(C)C)O)(C)O)C)C)C)O)(C)O
+#smiles_can CCC1C(C(C(N(CC(CC(C(C(C(C(C(=O)O1)C)OC2CC(C(C(O2)C)O)(C)OC)C)OC3C(C(CC(O3)C)N(C)C)O)(C)O)C)C)C)O)(C)O
+#inchikey MQTOSJVFKKJCRP-UHFFFAOYSA-N
+#pubchem_id 2269
+#mb_accession AU105201
+
+>ms2
+591.426200 444.000000
+749.518000 45284.000000
+750.521400 21700.000000
+751.526000 4928.000000
+

@@ -1,0 +1,19 @@
+>compound SM68619219
+>parentmass 123.0917
+>ionization [M+H]+
+>formula C7H10N2
+>rt 24.660000
+>profile orbitrap
+#smiles_iso CN(C)C1=CC=NC=C1
+#smiles_can CN(C)C1=CC=NC=C1
+#inchikey VHYFNPMBLIVWCW-UHFFFAOYSA-N
+#pubchem_id 14284
+#mb_accession SM883903
+
+>ms2
+79.041400 1767018.100000
+80.049400 4290446.500000
+107.060200 4696611.000000
+108.068100 7461184.500000
+123.091400 744835392.000000
+

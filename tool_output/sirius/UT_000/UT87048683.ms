@@ -1,0 +1,16 @@
+>compound UT87048683
+>parentmass 815.63
+>ionization [M+CH3COO]-
+>formula C43H85N2O6P
+>rt 1725.000000
+>profile orbitrap
+#smiles_iso CCCCCCCCCCCCCCCCCCCC(=O)N[C@H](COP(=O)([O-])OCC[N+](C)(C)C)[C@H](/C=C/CC/C=C/CCCCCCCCC)O
+#smiles_can CCCCCCCCCCCCCCCCCCCC(=O)NC(COP(=O)([O-])OCC[N+](C)(C)C)C(C=CCCC=CCCCCCCCCC)O
+#inchikey RIQUZAZTFMJZDT-IOZXCLFOSA-N
+#pubchem_id 134763895
+#mb_accession UT002018
+
+>ms2
+474.690000 4.800000
+741.420000 411.900000
+

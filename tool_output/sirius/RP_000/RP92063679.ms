@@ -1,0 +1,21 @@
+>compound RP92063679
+>parentmass 174.0561
+>ionization [M-H]-
+>formula C10H9NO2
+>rt 211.920000
+>profile qtof
+#smiles_iso C1=CC=C2C(=C1)C(=CN2)CC(=O)O
+#smiles_can C1=CC=C2C(=C1)C(=CN2)CC(=O)O
+#inchikey SEOVTRFCIGRIMH-UHFFFAOYSA-N
+#pubchem_id 802
+#mb_accession RP016611,RP016612
+
+>ms2
+130.067000 2208.000000
+174.056900 1542.000000
+
+>ms2
+128.051600 204.000000
+129.057600 34.000000
+130.067000 1440.000000
+

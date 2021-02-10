@@ -1,0 +1,21 @@
+>compound BML4029784
+>parentmass 273.091
+>ionization [M+H]+
+>formula C19H12O2
+>rt 621.840000
+>profile qtof
+#smiles_iso C1=CC=C(C=C1)C2=CC(=O)C3=C(O2)C4=CC=CC=C4C=C3
+#smiles_can C1=CC=C(C=C1)C2=CC(=O)C3=C(O2)C4=CC=CC=C4C=C3
+#inchikey VFMMPHCGEFXGIP-UHFFFAOYSA-N
+#pubchem_id 11790
+#mb_accession BML00242,BML00249
+
+>ms2
+143.045300 22.000000
+194.957300 23.000000
+273.092300 315.000000
+
+>ms2
+164.945900 29.000000
+273.088100 313.000000
+

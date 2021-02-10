@@ -1,0 +1,25 @@
+>compound EA43133958
+>parentmass 296.0169
+>ionization [M-H]-
+>formula C11H11N3O3S2
+>rt 258.000000
+>profile orbitrap
+#smiles_iso CC(=O)NC1=CC=C(C=C1)S(=O)(=O)NC2=NC=CS2
+#smiles_can CC(=O)NC1=CC=C(C=C1)S(=O)(=O)NC2=NC=CS2
+#inchikey KXNXWINFSDKMHD-UHFFFAOYSA-N
+#pubchem_id 67183
+#mb_accession EA024952,EA024953,EA024959,EA024960
+
+>ms2
+296.016100 20150.000000
+
+>ms2
+198.023300 12720.100000
+296.017600 8443.300000
+
+>ms2
+198.023700 6480.200000
+
+>ms2
+296.016700 1743.000000
+

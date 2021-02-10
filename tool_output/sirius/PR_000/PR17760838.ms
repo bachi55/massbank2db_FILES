@@ -1,0 +1,19 @@
+>compound PR17760838
+>parentmass 164.0346
+>ionization [M-H]-
+>formula C8H7NO3
+>rt 238.800000
+>profile qtof
+#smiles_iso COC1=CC2=C(C=C1)NC(=O)O2
+#smiles_can COC1=CC2=C(C=C1)NC(=O)O2
+#inchikey MKMCJLMBVKHUMS-UHFFFAOYSA-N
+#pubchem_id 10772
+#mb_accession PR309390
+
+>ms2
+97.303280 21.000000
+149.011460 264.000000
+150.013140 21.000000
+150.020650 16.000000
+164.032500 16.000000
+

@@ -1,0 +1,21 @@
+>compound EA01554990
+>parentmass 213.0789
+>ionization [M+H]+
+>formula C10H13ClN2O
+>rt 492.000000
+>profile orbitrap
+#smiles_iso CC1=C(C=C(C=C1)NC(=O)N(C)C)Cl
+#smiles_can CC1=C(C=C(C=C1)NC(=O)N(C)C)Cl
+#inchikey JXCGFZXSOMJFOA-UHFFFAOYSA-N
+#pubchem_id 27375
+#mb_accession EA027301,EA027314
+
+>ms2
+72.044400 2507185.500000
+168.021300 38604.000000
+
+>ms2
+72.044400 1390585.300000
+168.021200 9806.100000
+213.078600 13459.800000
+

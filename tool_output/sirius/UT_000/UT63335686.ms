@@ -1,0 +1,19 @@
+>compound UT63335686
+>parentmass 566.35
+>ionization [M+CH3COO]-
+>formula C25H50NO7P
+>rt 141.600000
+>profile orbitrap
+#smiles_iso CCCCCCCCCCCC/C=C\CCC(=O)OC(CO)COP(=O)([O-])OCC[N+](C)(C)C
+#smiles_can CCCCCCCCCCCCC=CCCC(=O)OC(CO)COP(=O)([O-])OCC[N+](C)(C)C
+#inchikey WRNNGLADZYOSJO-MSUUIHNZSA-N
+#pubchem_id 134776859
+#mb_accession UT001821
+
+>ms2
+196.040000 14.800000
+455.020000 12.000000
+484.530000 16.500000
+492.190000 157.900000
+506.070000 177.900000
+

@@ -1,0 +1,18 @@
+>compound SM23848647
+>parentmass 397.0823
+>ionization [M-H]-
+>formula C15H18N4O7S
+>rt 611.160000
+>profile orbitrap
+#smiles_iso CCCOC1=NN(C(=O)N1C)C(=O)NS(=O)(=O)C2=CC=CC=C2C(=O)OC
+#smiles_can CCCOC1=NN(C(=O)N1C)C(=O)NS(=O)(=O)C2=CC=CC=C2C(=O)OC
+#inchikey JTHMVYBOQLDDIY-UHFFFAOYSA-N
+#pubchem_id 177355
+#mb_accession SM838751
+
+>ms2
+113.022100 5529768.000000
+114.029900 24898.800000
+156.077800 2030716.200000
+397.081400 19702.000000
+

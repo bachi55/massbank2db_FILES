@@ -1,0 +1,20 @@
+>compound PR37804395
+>parentmass 158.0816
+>ionization [M+H]+
+>formula C7H11NO3
+>rt 147.600000
+>profile qtof
+#smiles_iso CC(=O)N1CCCC1C(=O)O
+#smiles_can CC(=O)N1CCCC1C(=O)O
+#inchikey GNMSLDIYJOSUSW-UHFFFAOYSA-N
+#pubchem_id 322640
+#mb_accession PR311152
+
+>ms2
+112.076570 163.000000
+113.072830 20.000000
+116.072970 18.000000
+139.039320 23.000000
+158.085100 21.000000
+158.101090 26.000000
+

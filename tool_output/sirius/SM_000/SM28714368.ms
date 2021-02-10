@@ -1,0 +1,20 @@
+>compound SM28714368
+>parentmass 223.0401
+>ionization [M-H]-
+>formula C14H8O3
+>rt 643.950000
+>profile orbitrap
+#smiles_iso C1=CC=C2C(=C1)C(=O)C3=C(C2=O)C=C(C=C3)O
+#smiles_can C1=CC=C2C(=C1)C(=O)C3=C(C2=O)C=C(C=C3)O
+#inchikey GCDBEYOJCZLKMC-UHFFFAOYSA-N
+#pubchem_id 11796
+#mb_accession SM814453,SM828951
+
+>ms2
+195.045100 1755708.400000
+223.040000 29465858.000000
+
+>ms2
+195.045100 6290848.000000
+223.040000 101544648.000000
+

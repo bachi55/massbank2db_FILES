@@ -1,0 +1,21 @@
+>compound BML0553099
+>parentmass 271.0601
+>ionization [M+H]+
+>formula C15H10O5
+>rt 418.740000
+>profile qtof
+#smiles_iso C1=CC(=CC=C1C2=C(C(=O)C3=C(O2)C=C(C=C3)O)O)O
+#smiles_can C1=CC(=CC=C1C2=C(C(=O)C3=C(O2)C=C(C=C3)O)O)O
+#inchikey OBWHQJYOOCRPST-UHFFFAOYSA-N
+#pubchem_id 5281611
+#mb_accession BML00317,BML00322
+
+>ms2
+192.964300 33.000000
+271.058200 594.000000
+
+>ms2
+121.034100 27.000000
+215.067300 50.000000
+271.059100 396.000000
+

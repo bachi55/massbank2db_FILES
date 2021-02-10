@@ -1,0 +1,27 @@
+>compound EA56278375
+>parentmass 583.983
+>ionization [M-H]-
+>formula C12H8F17NO4S
+>rt 1014.000000
+>profile orbitrap
+#smiles_iso CCN(CC(=O)O)S(=O)(=O)C(C(C(C(C(C(C(C(F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F
+#smiles_can CCN(CC(=O)O)S(=O)(=O)C(C(C(C(C(C(C(C(F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F
+#inchikey CKRXVVGETMYFIO-UHFFFAOYSA-N
+#pubchem_id 18134
+#mb_accession EA292153,EA292158,EA292159,EA292160
+
+>ms2
+168.989600 14192.700000
+218.985600 14649.200000
+
+>ms2
+525.978100 3501.700000
+
+>ms2
+168.989400 7422.500000
+218.985600 11042.200000
+268.981800 3632.700000
+
+>ms2
+168.989000 3313.600000
+

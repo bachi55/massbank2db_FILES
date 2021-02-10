@@ -1,0 +1,19 @@
+>compound SM66810721
+>parentmass 157.076
+>ionization [M+H]+
+>formula C10H8N2
+>rt 61.320000
+>profile orbitrap
+#smiles_iso C1=CC=NC(=C1)C2=CC=CC=N2
+#smiles_can C1=CC=NC(=C1)C2=CC=CC=N2
+#inchikey ROFVEXUMMXZLPA-UHFFFAOYSA-N
+#pubchem_id 1474
+#mb_accession SM816201
+
+>ms2
+78.033600 338438.800000
+96.044300 416973.000000
+130.065000 1968059.600000
+156.068400 209338.400000
+157.075900 133649408.000000
+

@@ -1,0 +1,27 @@
+>compound LU39425236
+>parentmass 150.0019
+>ionization [M-H]-
+>formula C7H5NOS
+>rt 768.900000
+>profile orbitrap
+#smiles_iso C1=CC=C2C(=C1)C(=O)NS2
+#smiles_can C1=CC=C2C(=C1)C(=O)NS2
+#inchikey DMSMPAJRVJJAGA-UHFFFAOYSA-N
+#pubchem_id 17520
+#mb_accession LU033051,LU033052,LU033053,LU033054,LU033055
+
+>ms2
+150.001900 243260.700000
+
+>ms2
+150.001900 244449.400000
+
+>ms2
+150.001900 132689.200000
+
+>ms2
+150.001900 48256.700000
+
+>ms2
+150.001900 17756.300000
+

@@ -1,0 +1,20 @@
+>compound PR70312683
+>parentmass 132.1028
+>ionization [M+H]+
+>formula C6H13NO2
+>rt 116.400000
+>profile qtof
+#smiles_iso CCC(C)C(C(=O)O)N
+#smiles_can CCC(C)C(C(=O)O)N
+#inchikey AGPKZVBTJJNPAG-UHFFFAOYSA-N
+#pubchem_id 791
+#mb_accession PR311151
+
+>ms2
+86.041950 22.000000
+86.097150 2317.000000
+87.093060 37.000000
+87.102020 162.000000
+132.088880 21.000000
+132.102580 535.000000
+

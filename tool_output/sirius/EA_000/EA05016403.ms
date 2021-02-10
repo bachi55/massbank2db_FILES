@@ -1,0 +1,22 @@
+>compound EA05016403
+>parentmass 254.045
+>ionization [M-H]-
+>formula C9H10ClN5O2
+>rt 276.000000
+>profile orbitrap
+#smiles_iso C1CN(C(=N1)N[N+](=O)[O-])CC2=CN=C(C=C2)Cl
+#smiles_can C1CN(C(=N1)N[N+](=O)[O-])CC2=CN=C(C=C2)Cl
+#inchikey YWTYJOPNNQFBPC-UHFFFAOYSA-N
+#pubchem_id 86418
+#mb_accession EA270951,EA270964
+
+>ms2
+153.022500 450440.000000
+207.044200 112563.300000
+210.044000 81092.000000
+
+>ms2
+153.022300 92242.900000
+207.043900 13255.000000
+210.043500 14575.700000
+

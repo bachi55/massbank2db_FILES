@@ -1,0 +1,20 @@
+>compound PR28706141
+>parentmass 237.1254
+>ionization [M+H]+
+>formula C12H16N2O3
+>rt 170.400000
+>profile qtof
+#smiles_iso CC(C(=O)NC(CC1=CC=CC=C1)C(=O)O)N
+#smiles_can CC(C(=O)NC(CC1=CC=CC=C1)C(=O)O)N
+#inchikey OMNVYXHOSHNURL-UHFFFAOYSA-N
+#pubchem_id 2080
+#mb_accession PR311050
+
+>ms2
+99.567740 21.000000
+120.085300 19.000000
+148.049610 18.000000
+166.078110 31.000000
+166.091160 17.000000
+237.139240 17.000000
+

@@ -1,0 +1,28 @@
+>compound AU14578348
+>parentmass 734.4685
+>ionization [M+H]+
+>formula C37H67NO13
+>rt 484.500000
+>profile qtof
+#smiles_iso CC[C@@H]1[C@@]([C@@H]([C@H](C(=O)[C@@H](C[C@@]([C@@H]([C@H]([C@@H]([C@H](C(=O)O1)C)O[C@H]2C[C@@]([C@H]([C@@H](O2)C)O)(C)OC)C)O[C@H]3[C@@H]([C@H](C[C@H](O3)C)N(C)C)O)(C)O)C)C)O)(C)O
+#smiles_can CCC1C(C(C(C(=O)C(CC(C(C(C(C(C(=O)O1)C)OC2CC(C(C(O2)C)O)(C)OC)C)OC3C(C(CC(O3)C)N(C)C)O)(C)O)C)C)O)(C)O
+#inchikey ULGZDMOVFRHVEP-RWJQBGPGSA-N
+#pubchem_id 12560
+#mb_accession AU105402,AU105403,AU105404,AU105405
+
+>ms2
+158.116800 672.000000
+576.384700 540.000000
+734.470300 556.000000
+
+>ms2
+158.116700 1712.000000
+576.373500 444.000000
+
+>ms2
+158.117600 2284.000000
+159.120400 300.000000
+
+>ms2
+158.118000 1700.000000
+

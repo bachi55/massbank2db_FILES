@@ -1,0 +1,20 @@
+>compound SM01985093
+>parentmass 161.9872
+>ionization [M+H]+
+>formula C6H5Cl2N
+>rt 503.100000
+>profile orbitrap
+#smiles_iso C1=CC(=C(C=C1N)Cl)Cl
+#smiles_can C1=CC(=C(C=C1N)Cl)Cl
+#inchikey SDYWXFYBZPNOFX-UHFFFAOYSA-N
+#pubchem_id 7257
+#mb_accession SM810401
+
+>ms2
+126.010500 15577.100000
+127.018300 3798914.200000
+144.960600 17477.700000
+160.979200 12762.900000
+161.987100 8632358.000000
+172.966800 76211.400000
+

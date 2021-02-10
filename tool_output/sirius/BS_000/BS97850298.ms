@@ -1,0 +1,20 @@
+>compound BS97850298
+>parentmass 421.2081
+>ionization [M-H]-
+>formula C19H34O10
+>rt 524.400000
+>profile qtof
+#smiles_iso CCCCC[C@H](C=C)O[C@H]1[C@@H]([C@H]([C@@H]([C@H](O1)CO[C@H]2[C@@H]([C@H]([C@H](CO2)O)O)O)O)O)O
+#smiles_can CCCCCC(C=C)OC1C(C(C(C(O1)COC2C(C(C(CO2)O)O)O)O)O)O
+#inchikey VXNMHZVTDWLWRX-GNRUMFBNSA-N
+#pubchem_id 101401716
+#mb_accession BS001010
+
+>ms2
+101.023900 999.000000
+113.023900 548.000000
+116.009700 53.000000
+131.035300 64.000000
+161.046100 88.000000
+255.798700 51.000000
+

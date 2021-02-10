@@ -1,0 +1,20 @@
+>compound RP95522576
+>parentmass 277.2173
+>ionization [M-H]-
+>formula C18H30O2
+>rt 399.840000
+>profile qtof
+#smiles_iso CC/C=C\C/C=C\C/C=C\CCCCCCCC(=O)O
+#smiles_can CCC=CCC=CCC=CCCCCCCCC(=O)O
+#inchikey DTOSIQBPPRVQHS-PDBXOOCHSA-N
+#pubchem_id 5280934
+#mb_accession RP030411,RP030412
+
+>ms2
+277.217300 8420.000000
+
+>ms2
+205.195100 28.000000
+260.214800 44.000000
+277.217500 4166.000000
+

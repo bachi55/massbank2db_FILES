@@ -1,0 +1,20 @@
+>compound PR88932511
+>parentmass 189.1226
+>ionization [M+H]+
+>formula C8H16N2O3
+>rt 124.800000
+>profile qtof
+#smiles_iso CC(C)CC(C(=O)NCC(=O)O)N
+#smiles_can CC(C)CC(C(=O)NCC(=O)O)N
+#inchikey LESXFEZIFXFIQR-UHFFFAOYSA-N
+#pubchem_id 79070
+#mb_accession PR311064
+
+>ms2
+86.091040 24.000000
+86.097090 129.000000
+116.071280 27.000000
+135.028660 20.000000
+172.968480 21.000000
+189.129360 38.000000
+

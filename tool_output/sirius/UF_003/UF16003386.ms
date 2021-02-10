@@ -1,0 +1,20 @@
+>compound UF16003386
+>parentmass 279.1591
+>ionization [M+H]+
+>formula C16H22O4
+>rt 1623.600000
+>profile orbitrap
+#smiles_iso CCCCOC(=O)C1=CC=CC=C1C(=O)OCCCC
+#smiles_can CCCCOC(=O)C1=CC=CC=C1C(=O)OCCCC
+#inchikey DOIRQSBPFJWKBE-UHFFFAOYSA-N
+#pubchem_id 3026
+#mb_accession UF418001,UF418002
+
+>ms2
+121.029000 4751.400000
+149.023800 246375.600000
+
+>ms2
+121.028800 44528.000000
+149.023900 108201.700000
+

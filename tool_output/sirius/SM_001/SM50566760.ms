@@ -1,0 +1,19 @@
+>compound SM50566760
+>parentmass 100.1121
+>ionization [M+H]+
+>formula C6H13N
+>rt 30.060000
+>profile orbitrap
+#smiles_iso C1CCC(CC1)N
+#smiles_can C1CCC(CC1)N
+#inchikey PAFZNILMFXTMIY-UHFFFAOYSA-N
+#pubchem_id 7965
+#mb_accession SM826601
+
+>ms2
+53.038800 152435.300000
+55.054400 4621998.000000
+58.029000 19830.000000
+83.085500 18227198.000000
+100.112100 6008278.500000
+

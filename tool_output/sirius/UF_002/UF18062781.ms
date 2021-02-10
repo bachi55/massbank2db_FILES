@@ -1,0 +1,21 @@
+>compound UF18062781
+>parentmass 213.0789
+>ionization [M+H]+
+>formula C10H13ClN2O
+>rt 1376.760000
+>profile orbitrap
+#smiles_iso CC1=C(C=C(C=C1)NC(=O)N(C)C)Cl
+#smiles_can CC1=C(C=C(C=C1)NC(=O)N(C)C)Cl
+#inchikey JXCGFZXSOMJFOA-UHFFFAOYSA-N
+#pubchem_id 27375
+#mb_accession UF400703,UF400704
+
+>ms2
+72.044200 1226101.600000
+168.020900 35134.300000
+213.078600 585330.900000
+
+>ms2
+72.044200 1035366.600000
+168.021000 23381.600000
+

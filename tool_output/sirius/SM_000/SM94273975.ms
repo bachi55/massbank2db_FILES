@@ -1,0 +1,20 @@
+>compound SM94273975
+>parentmass 286.969
+>ionization [M-H]-
+>formula C10H8O6S2
+>rt 117.840000
+>profile orbitrap
+#smiles_iso C1=CC(=CC2=C1C=CC(=C2)S(=O)(=O)O)S(=O)(=O)O
+#smiles_can C1=CC(=CC2=C1C=CC(=C2)S(=O)(=O)O)S(=O)(=O)O
+#inchikey VILFVXYKHXVYAB-UHFFFAOYSA-N
+#pubchem_id 66707
+#mb_accession SM867751
+
+>ms2
+143.050300 730689.200000
+159.045500 4983.900000
+206.004400 6564.500000
+207.012200 2890253.800000
+223.007200 15932.300000
+286.969000 3266782.500000
+

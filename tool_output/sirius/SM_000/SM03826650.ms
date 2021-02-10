@@ -1,0 +1,19 @@
+>compound SM03826650
+>parentmass 199.0167
+>ionization [M-H]-
+>formula C9H9ClO3
+>rt 622.680000
+>profile orbitrap
+#smiles_iso CC1=C(C=CC(=C1)Cl)OCC(=O)O
+#smiles_can CC1=C(C=CC(=C1)Cl)OCC(=O)O
+#inchikey WHKUVVPPKQRRBV-UHFFFAOYSA-N
+#pubchem_id 7204
+#mb_accession SM842156
+
+>ms2
+125.016000 218311.600000
+140.003400 87346.200000
+141.011200 39279268.000000
+155.027000 343506.100000
+199.016800 1239307.500000
+

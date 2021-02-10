@@ -1,0 +1,20 @@
+>compound AU60271997
+>parentmass 373.1576
+>ionization [M-H]-
+>formula C22H27ClO3
+>rt 604.260000
+>profile qtof
+#smiles_iso CC(=O)[C@]1(CC[C@@H]2[C@@]1(CC[C@H]3[C@H]2C=C(C4=CC(=O)[C@@H]5C[C@@H]5[C@]34C)Cl)C)O
+#smiles_can CC(=O)C1(CCC2C1(CCC3C2C=C(C4=CC(=O)C5CC5C34C)Cl)C)O
+#inchikey DUSHUSLJJMDGTE-ZJPMUUANSA-N
+#pubchem_id 5284537
+#mb_accession AU239657,AU239658
+
+>ms2
+373.159100 1044.000000
+374.161700 308.000000
+
+>ms2
+345.169500 344.000000
+373.153600 532.000000
+

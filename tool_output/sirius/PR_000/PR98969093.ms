@@ -1,0 +1,20 @@
+>compound PR98969093
+>parentmass 393.0782
+>ionization [M-H]-
+>formula C11H23O13P
+>rt 114.600000
+>profile qtof
+#smiles_iso C(C1C(C(C(C(O1)OC(COP(=O)(O)O)C(C(CO)O)O)O)O)O)O
+#smiles_can C(C1C(C(C(C(O1)OC(COP(=O)(O)O)C(C(CO)O)O)O)O)O)O
+#inchikey HJZBAIMJDQCPCL-UHFFFAOYSA-N
+#pubchem_id 14018120
+#mb_accession PR309120
+
+>ms2
+78.955560 20.000000
+96.955760 83.000000
+96.966150 340.000000
+97.064190 17.000000
+289.014590 33.000000
+393.005400 17.000000
+

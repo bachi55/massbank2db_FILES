@@ -1,0 +1,23 @@
+>compound RP66037725
+>parentmass 221.0602
+>ionization [M-H]-
+>formula C7H14N2O4S
+>rt 33.780000
+>profile qtof
+#smiles_iso C(CSC[C@@H](C(=O)O)N)[C@@H](C(=O)O)N
+#smiles_can C(CSCC(C(=O)O)N)C(C(=O)O)N
+#inchikey ILRYLPWNYFXEMH-WHFBIAKZSA-N
+#pubchem_id 439258
+#mb_accession RP014611,RP014612
+
+>ms2
+86.025200 150.000000
+124.078800 34.000000
+221.060500 6370.000000
+
+>ms2
+86.024900 148.000000
+120.011700 242.000000
+134.028500 240.000000
+221.060200 124.000000
+

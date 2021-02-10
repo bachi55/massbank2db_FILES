@@ -1,0 +1,18 @@
+>compound PR24816338
+>parentmass 286.20128
+>ionization [M+H]+
+>formula C15H27NO4
+>rt 183.000000
+>profile qtof
+#smiles_iso CC(C)C(C(C)O)(C(=O)OCC1CCN2C1CCC2)O
+#smiles_can CC(C)C(C(C)O)(C(=O)OCC1CCN2C1CCC2)O
+#inchikey BWQSLRZZOVFVHJ-UHFFFAOYSA-N
+#pubchem_id 3454277
+#mb_accession PR310563
+
+>ms2
+142.130070 26.000000
+158.952730 20.000000
+159.062870 21.000000
+286.201690 193.000000
+

@@ -1,0 +1,19 @@
+>compound PR99847276
+>parentmass 161.0226
+>ionization [M-H]-
+>formula C9H6O3
+>rt 218.400000
+>profile qtof
+#smiles_iso C1=CC(=CC2=C1C=CC(=O)O2)O
+#smiles_can C1=CC(=CC2=C1C=CC(=O)O2)O
+#inchikey ORHBXUUXSCNDEV-UHFFFAOYSA-N
+#pubchem_id 5281426
+#mb_accession PR309354
+
+>ms2
+77.039770 18.000000
+86.356520 21.000000
+133.031020 65.000000
+160.890440 23.000000
+161.023320 738.000000
+

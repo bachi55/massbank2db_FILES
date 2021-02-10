@@ -1,0 +1,18 @@
+>compound BS48581082
+>parentmass 299.058
+>ionization [M-H]-
+>formula C16H12O6
+>rt 634.200000
+>profile qtof
+#smiles_iso COC1=C(C=C(C=C1)C2=CC(=O)C3=C(C=C(C=C3O2)O)O)O
+#smiles_can COC1=C(C=C(C=C1)C2=CC(=O)C3=C(C=C(C=C3O2)O)O)O
+#inchikey MBNGWHIJMBWFHU-UHFFFAOYSA-N
+#pubchem_id 5281612
+#mb_accession BS003181
+
+>ms2
+284.034700 999.000000
+285.037400 129.000000
+299.058000 300.000000
+300.061100 34.000000
+

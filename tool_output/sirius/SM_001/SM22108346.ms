@@ -1,0 +1,18 @@
+>compound SM22108346
+>parentmass 247.0965
+>ionization [M+H]+
+>formula C14H14O4
+>rt 677.760000
+>profile orbitrap
+#smiles_iso C=CCOC(=O)C1=CC=CC=C1C(=O)OCC=C
+#smiles_can C=CCOC(=O)C1=CC=CC=C1C(=O)OCC=C
+#inchikey QUDWYFHPNIMBFC-UHFFFAOYSA-N
+#pubchem_id 8560
+#mb_accession SM837002
+
+>ms2
+53.002400 494716.300000
+53.997600 117224.000000
+149.023100 230329.600000
+189.054600 8280093.500000
+

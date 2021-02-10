@@ -1,0 +1,19 @@
+>compound SM51016664
+>parentmass 215.9988
+>ionization [M-H]-
+>formula C9H9Cl2NO
+>rt 647.340000
+>profile orbitrap
+#smiles_iso CCC(=O)NC1=CC(=C(C=C1)Cl)Cl
+#smiles_can CCC(=O)NC1=CC(=C(C=C1)Cl)Cl
+#inchikey LFULEKSKNZEWOE-UHFFFAOYSA-N
+#pubchem_id 4933
+#mb_accession SM848453
+
+>ms2
+123.995400 167343.500000
+159.972600 8080483.500000
+160.956500 46852.800000
+185.952000 13644.700000
+215.998700 12207584.000000
+

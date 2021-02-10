@@ -1,0 +1,24 @@
+>compound LU93828785
+>parentmass 159.9726
+>ionization [M-H]-
+>formula C6H5Cl2N
+>rt 1057.860000
+>profile orbitrap
+#smiles_iso C1=C(C=C(C=C1Cl)Cl)N
+#smiles_can C1=C(C=C(C=C1Cl)Cl)N
+#inchikey UQRLKWGPEVNVHT-UHFFFAOYSA-N
+#pubchem_id 12281
+#mb_accession LU133251,LU133252,LU133253
+
+>ms2
+123.995800 3450.700000
+159.972700 22701.100000
+
+>ms2
+123.995800 6625.200000
+159.972700 60316.200000
+
+>ms2
+123.996600 1810.900000
+159.972600 6274.900000
+
