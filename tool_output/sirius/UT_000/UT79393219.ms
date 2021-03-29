@@ -10,6 +10,6 @@
 #pubchem_id 134784900
 #mb_accession UT001773
 
->ms2
+>ms2peaks
 802.260000 111.400000
 

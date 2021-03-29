@@ -10,9 +10,9 @@
 #pubchem_id 8630
 #mb_accession LU024651,LU024652
 
->ms2
+>ms2peaks
 159.972700 18478.000000
 
->ms2
+>ms2peaks
 159.972400 6779.600000
 

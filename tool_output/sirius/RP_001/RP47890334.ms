@@ -10,6 +10,6 @@
 #pubchem_id 750
 #mb_accession RP000101
 
->ms2
+>ms2peaks
 76.038800 12322.000000
 

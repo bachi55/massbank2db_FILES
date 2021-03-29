@@ -10,9 +10,9 @@
 #pubchem_id 5293655
 #mb_accession NA002616,NA002617
 
->ms2
+>ms2peaks
 303.049700 2039.200000
 
->ms2
+>ms2peaks
 303.049400 2352.700000
 

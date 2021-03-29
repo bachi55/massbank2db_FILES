@@ -10,9 +10,9 @@
 #pubchem_id 4365802
 #mb_accession BML00867,BML00876
 
->ms2
+>ms2peaks
 697.347800 399.000000
 
->ms2
+>ms2peaks
 697.345700 382.000000
 

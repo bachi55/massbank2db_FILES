@@ -10,6 +10,6 @@
 #pubchem_id 6938
 #mb_accession SM834451
 
->ms2
+>ms2peaks
 185.027700 34967548.000000
 

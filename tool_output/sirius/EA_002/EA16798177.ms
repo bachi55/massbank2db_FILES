@@ -10,9 +10,9 @@
 #pubchem_id 14550408
 #mb_accession EA292201,EA292214
 
->ms2
+>ms2peaks
 444.985200 105409.300000
 
->ms2
+>ms2peaks
 444.985300 56839.500000
 

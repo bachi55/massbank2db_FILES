@@ -28,6 +28,7 @@ import os
 import sqlite3
 import tqdm
 import argparse
+import pandas as pd
 
 from massbank2db.db import MassbankDB
 from massbank2db.spectrum import MBSpectrum
@@ -47,13 +48,17 @@ def write_ms_and_cand_files(ds, n_compounds):
     else:
         raise ValueError("Unsupported output format: '%s'" % args.output_format)
 
+    # Spectra summary
+    df_summary = []
+
     with MassbankDB(args.massbank_db_fn) as mb_db:
         for idx, (mol, specs, cands) in tqdm.tqdm(enumerate(
                 mb_db.iter_spectra(dataset=ds, grouped=True, return_candidates=args.return_candidates,
                                    pc_dbfn=args.pubchem_db_fn)),
                 total=n_compounds):
 
-            # Spectra peaks are merged into a single spectrum.
+            # Merge spectra meta-information (e.g. precursor-mz, retention-time) and peaks (if desired) into a single
+            # spectrum.
             spec = MBSpectrum.merge_spectra(specs, merge_peak_lists=merge_peak_lists)
 
             if args.output_format.lower() == "sirius":
@@ -77,8 +82,23 @@ def write_ms_and_cand_files(ds, n_compounds):
 
             # Write output
             for k, v in output.items():
+                if v is None:
+                    continue
+
                 with open(os.path.join(odir, k), "w") as ofile:
                     ofile.write(v)
+
+            # Write out spectra summary
+            df_summary.append([spec.get("accession"), spec.get("dataset"), ",".join(spec.get("original_accessions")),
+                               spec.get("precursor_mz"), spec.get("precursor_type"),
+                               spec.get("pubchem_id"),
+                               spec.get("retention_time")])
+
+    pd.DataFrame(df_summary, columns=["accession", "dataset", "original_accessions",
+                                      "precursor_mz", "precursor_type",
+                                      "pubchem_id",
+                                      "retention_time"]) \
+        .to_csv(os.path.join(odir, "spectra_summary.tsv"), sep="\t", index=False)
 
 
 def parse_cli_arguments():

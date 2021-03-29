@@ -10,6 +10,6 @@
 #pubchem_id 18831
 #mb_accession AU202201
 
->ms2
+>ms2peaks
 146.024100 960.000000
 

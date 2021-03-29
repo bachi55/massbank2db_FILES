@@ -10,9 +10,9 @@
 #pubchem_id 3000540
 #mb_accession UF410501,UF410502
 
->ms2
+>ms2peaks
 126.127700 786754.800000
 
->ms2
+>ms2peaks
 126.127800 679508.900000
 
