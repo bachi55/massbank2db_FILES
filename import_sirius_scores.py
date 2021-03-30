@@ -31,8 +31,24 @@ import pandas as pd
 import re
 import glob
 import logging
+import traceback
 
 from massbank2db.db import MassbankDB
+
+# ================
+# Setup the Logger
+LOGGER = logging.getLogger("Import CSI:FingerID Scores")
+LOGGER.setLevel(logging.INFO)
+LOGGER.propagate = False
+
+CH = logging.StreamHandler()
+CH.setLevel(logging.INFO)
+
+FORMATTER = logging.Formatter('[%(levelname)s] %(name)s : %(message)s')
+CH.setFormatter(FORMATTER)
+
+LOGGER.addHandler(CH)
+# ================
 
 
 def create_tables(conn: sqlite3.Connection):
@@ -103,7 +119,6 @@ def create_indices(conn: sqlite3.Connection):
     conn.execute("CREATE INDEX IF NOT EXISTS fpd__name ON fingerprints_data(name)")
 
 
-
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument("massbank_db_fn", help="Filepath of the Massbank database.")
@@ -119,9 +134,7 @@ if __name__ == "__main__":
     conn_mb = sqlite3.connect(args.massbank_db_fn)
     conn_pc = sqlite3.connect(args.pubchem_db_fn)
 
-
     prefix_pattern = re.compile(r"[A-Z]{2,3}")
-
 
     try:
         with conn_mb:
@@ -141,12 +154,16 @@ if __name__ == "__main__":
                              "Massbank spectra have not been used for training. The correct molecular formula was used "
                              "to construct the candidate sets."))
 
+        spectra_idx = 0
         with tarfile.open(os.path.join(args.idir, args.score_tgz_fn), "r:gz") as score_archive:
             for entry in score_archive:
                 if entry.isreg():
+                    # Found a spectrum ...
+                    spectra_idx += 1
                     spec_id = os.path.basename(entry.name).split(".")[0]  # e.g. AC01111385
-                    print(spec_id)
+                    LOGGER.info("Process spectrum %05d: id = %s" % (spectra_idx, spec_id))
 
+                    # ==================================
                     # Find meta-information for spectrum
                     meta_info = None
 
@@ -157,13 +174,17 @@ if __name__ == "__main__":
                             row_idx = _df["accession"].to_list().index(spec_id)
                             meta_info = _df.iloc[row_idx, :]
                             meta_info["dataset"] = ds_pref
-                            print(meta_info)
+                            break
                         except ValueError:
+                            # Spectrum ID was not found in the dataset
                             continue
 
                     if meta_info is None:
-                        raise ValueError("Missing meta-data")
+                        # Fail here
+                        raise RuntimeError("[%s] Meta-data for spectrum not found." % spec_id)
+                    # ==================================
 
+                    # =================================================================================
                     # Load candidates and with CSI:FingerID scores and combine with PubChem information
                     cands = pd.read_csv(score_archive.extractfile(entry), sep="\t")  # type: pd.DataFrame
                     cands = pd.merge(
@@ -175,21 +196,26 @@ if __name__ == "__main__":
                         left_on="inchikey", right_on="InChIKey_1", how="inner", suffixes=("__SIRIUS", "__PUBCHEM")
                     )
 
-                    _unq_mf = cands["molecular_formula__PUBCHEM"].unique()
-                    if len(_unq_mf > 1):
-                        print("The molecular formula of the candidate set is not unique.")
-
-                    if meta_info["molecular_formula"] not in _unq_mf:
-                        raise ValueError("Correct molecular formula is not on the candidate set: {} not in {}."
-                                         .format(meta_info["molecular_formula"], _unq_mf))
-
                     if meta_info["pubchem_id"] not in cands["cid__PUBCHEM"]:
-                        raise ValueError("Correct molecular structure is not in the candidate set: {}."
-                                         .format(meta_info["pubchem_id"]))
+                        raise RuntimeError("[%s] Correct molecular structure (cid = %d, inchikey = %s) is not in the "
+                                           "candidate set."
+                                           % (spec_id, meta_info["pubchem_id"], meta_info["inchikey"]))
 
-                    # Insert candidates and scores to database
+                    _unq_mf = cands["molecular_formula__PUBCHEM"].unique()
+                    if meta_info["molecular_formula"] not in _unq_mf:
+                        raise RuntimeError("[{}]Correct molecular formula is not on the candidate set: {} not in {}."
+                                           .format(spec_id, meta_info["molecular_formula"], _unq_mf))
+
+                    if len(_unq_mf > 1):
+                        LOGGER.warning("[{}] There is more than one molecular formula in the candidate set: {}."
+                                       .format(spec_id, _unq_mf))
+                    # =================================================================================
+
+                    # ===========================
+                    # Insert new data into the DB
                     with conn_mb:
-                        conn_mb.execute("INSERT INTO scored_spectra_meta VALUES (?, ?, ?, ?, ?, ?, ?)",
+                        # Meta-information about the scored spectra
+                        conn_mb.execute("INSERT OR IGNORE INTO scored_spectra_meta VALUES (?, ?, ?, ?, ?, ?, ?)",
                                         (
                                             meta_info["accession"], meta_info["dataset"],
                                             meta_info["original_accessions"], meta_info["precursor_mz"],
@@ -197,12 +223,7 @@ if __name__ == "__main__":
                                             meta_info["retention_time"]
                                         ))
 
-                        conn_mb.executemany("INSERT INTO merged_accessions VALUES (?, ?)",
-                                            [
-                                                (acc, meta_info["accession"])
-                                                for acc in meta_info["original_accessions"].split(",")
-                                            ])
-
+                        # Molecule structures associated with the candidates
                         conn_mb.executemany("INSERT OR IGNORE INTO molecules VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                                             [
                                                 (row["cid__PUBCHEM"], row["InChI__PUBCHEM"], row["InChIKey__PUBCHEM"],
@@ -213,6 +234,7 @@ if __name__ == "__main__":
                                                 for _, row in cands.iterrows()
                                             ])
 
+                        # CSI:FingerID candidate scores
                         conn_mb.executemany(
                             "INSERT INTO spectra_candidate_scores VALUES (?, ?, ?, ?, ?)",
                             [
@@ -222,6 +244,14 @@ if __name__ == "__main__":
                             ]
                         )
 
+                        # Insert information about the merged Massbank accessions and their new ids
+                        conn_mb.executemany("INSERT INTO merged_accessions VALUES (?, ?)",
+                                            [
+                                                (acc, meta_info["accession"])
+                                                for acc in meta_info["original_accessions"].split(",")
+                                            ])
+
+                        # CSI:FingerID fingerprints as index strings
                         conn_mb.executemany(
                             "INSERT OR IGNORE INTO fingerprints_data VALUES (?, ?, ?)",
                             [
@@ -231,10 +261,14 @@ if __name__ == "__main__":
                                 for _, row in cands.iterrows()
                             ]
                         )
+                    # ===========================
 
         with conn_mb:
             create_indices(conn_mb)
 
+    except RuntimeError as err:
+        traceback.print_exc()
+        LOGGER.error(err)
     finally:
         conn_mb.close()
         conn_pc.close()
