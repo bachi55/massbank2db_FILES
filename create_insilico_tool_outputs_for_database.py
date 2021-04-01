@@ -91,12 +91,12 @@ def write_ms_and_cand_files(ds, n_compounds):
             # Write out spectra summary
             df_summary.append([spec.get("accession"), spec.get("dataset"), ",".join(spec.get("original_accessions")),
                                spec.get("precursor_mz"), spec.get("precursor_type"),
-                               spec.get("pubchem_id"),
+                               spec.get("pubchem_id"), spec.get("molecular_formula"),
                                spec.get("retention_time")])
 
     pd.DataFrame(df_summary, columns=["accession", "dataset", "original_accessions",
                                       "precursor_mz", "precursor_type",
-                                      "pubchem_id",
+                                      "pubchem_id", "molecular_formula",
                                       "retention_time"]) \
         .to_csv(os.path.join(odir, "spectra_summary.tsv"), sep="\t", index=False)
 

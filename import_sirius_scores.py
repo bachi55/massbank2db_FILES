@@ -32,6 +32,7 @@ import re
 import glob
 import logging
 import traceback
+import numpy as np
 
 from massbank2db.db import MassbankDB
 
@@ -62,6 +63,13 @@ def create_tables(conn: sqlite3.Connection):
                  "  retention_time      REAL NOT NULL,"
                  "  FOREIGN KEY (cid) REFERENCES molecules(cid),"
                  "  FOREIGN KEY (dataset) REFERENCES datasets(name))")
+
+    conn.execute("CREATE TABLE IF NOT EXISTS candidates_spectra ("
+                 "  spectrum        VARCHAR NOT NULL,"
+                 "  candidate       INT NOT NULL,"
+                 "  FOREIGN KEY (candidate) REFERENCES molecules(cid),"
+                 "  FOREIGN KEY (spectrum) REFERENCES scored_spectra_meta(accession),"
+                 "  CONSTRAINT spectrum_candidate_combination UNIQUE (spectrum, candidate))")
 
     conn.execute("CREATE TABLE IF NOT EXISTS merged_accessions ("
                  "  massbank_accession  VARCHAR PRIMARY KEY,"
@@ -103,7 +111,7 @@ def create_tables(conn: sqlite3.Connection):
                  "  name        VARCHAR NOT NULL,"
                  "  fingerprint VARCHAR NOT NULL,"
                  "  FOREIGN KEY (molecule) REFERENCES molecules(cid),"
-                 "  FOREIGN KEY (name) REFERENCES fingerprints_met(name),"
+                 "  FOREIGN KEY (name) REFERENCES fingerprints_meta(name),"
                  "  PRIMARY KEY (molecule, name))")
 
 
@@ -114,6 +122,8 @@ def create_indices(conn: sqlite3.Connection):
     conn.execute("CREATE INDEX IF NOT EXISTS scc__dataset ON spectra_candidate_scores(dataset)")
 
     conn.execute("CREATE INDEX IF NOT EXISTS ma__merged_accession ON merged_accessions(merged_accession)")
+
+    conn.execute("CREATE INDEX IF NOT EXISTS cs__spectrum ON candidates_spectra(spectrum)")
 
     conn.execute("CREATE INDEX IF NOT EXISTS fpd__molecule ON fingerprints_data(molecule)")
     conn.execute("CREATE INDEX IF NOT EXISTS fpd__name ON fingerprints_data(name)")
@@ -130,6 +140,8 @@ if __name__ == "__main__":
         type=str,
         help="Filepath of the PubChem database.")
     args = arg_parser.parse_args()
+
+    sqlite3.register_adapter(np.int64, int)
 
     conn_mb = sqlite3.connect(args.massbank_db_fn)
     conn_pc = sqlite3.connect(args.pubchem_db_fn)
@@ -172,8 +184,8 @@ if __name__ == "__main__":
                         _df = pd.read_csv(os.path.join(d, "spectra_summary.tsv"), sep="\t")
                         try:
                             row_idx = _df["accession"].to_list().index(spec_id)
-                            meta_info = _df.iloc[row_idx, :]
-                            meta_info["dataset"] = ds_pref
+                            meta_info = _df.iloc[row_idx, :].copy()
+                            meta_info["dataset"] = os.path.basename(d)  # e.g. AC_003
                             break
                         except ValueError:
                             # Spectrum ID was not found in the dataset
@@ -187,26 +199,34 @@ if __name__ == "__main__":
                     # =================================================================================
                     # Load candidates and with CSI:FingerID scores and combine with PubChem information
                     cands = pd.read_csv(score_archive.extractfile(entry), sep="\t")  # type: pd.DataFrame
+                    LOGGER.info("[%s] Number of candidates (SIRIUS): %d" % (spec_id, len(cands)))
+
                     cands = pd.merge(
                         left=cands,
                         right=pd.read_sql(
-                            "SELECT * FROM compounds WHERE InChIKey_1 IN %s" % MassbankDB._in_sql(cands["inchikey"]),
+                            "SELECT * FROM compounds "
+                            "   WHERE InChIKey_1 IN %s"
+                            "     AND molecular_formula == '%s'"
+                            % (MassbankDB._in_sql(cands["inchikey"]), meta_info["molecular_formula"]),
                             conn_pc
                         ),
                         left_on="inchikey", right_on="InChIKey_1", how="inner", suffixes=("__SIRIUS", "__PUBCHEM")
                     )
 
-                    if meta_info["pubchem_id"] not in cands["cid__PUBCHEM"]:
-                        raise RuntimeError("[%s] Correct molecular structure (cid = %d, inchikey = %s) is not in the "
-                                           "candidate set."
-                                           % (spec_id, meta_info["pubchem_id"], meta_info["inchikey"]))
+                    if meta_info["pubchem_id"] not in cands["cid"].to_list():
+                        LOGGER.error("[%s] Correct molecular structure (cid = %d) is not in the candidate set."
+                                     % (spec_id, meta_info["pubchem_id"]))
+                        continue
 
-                    _unq_mf = cands["molecular_formula__PUBCHEM"].unique()
+                    _unq_mf = cands["molecular_formula"].unique()
                     if meta_info["molecular_formula"] not in _unq_mf:
-                        raise RuntimeError("[{}]Correct molecular formula is not on the candidate set: {} not in {}."
-                                           .format(spec_id, meta_info["molecular_formula"], _unq_mf))
+                        LOGGER.error("[{}] Correct molecular formula is not on the candidate set: {} not in {}."
+                                     .format(spec_id, meta_info["molecular_formula"], _unq_mf))
+                        continue
 
-                    if len(_unq_mf > 1):
+                    LOGGER.info("[%s] Number of candidates (with PubChem match): %d" % (spec_id, len(cands)))
+
+                    if len(_unq_mf) > 1:
                         LOGGER.warning("[{}] There is more than one molecular formula in the candidate set: {}."
                                        .format(spec_id, _unq_mf))
                     # =================================================================================
@@ -214,6 +234,17 @@ if __name__ == "__main__":
                     # ===========================
                     # Insert new data into the DB
                     with conn_mb:
+                        # Molecule structures associated with the candidates
+                        conn_mb.executemany("INSERT OR IGNORE INTO molecules VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                            [
+                                                (row["cid"], row["InChI"], row["InChIKey"],
+                                                 row["InChIKey_1"], row["InChIKey_2"],
+                                                 row["SMILES_ISO"], row["SMILES_CAN"],
+                                                 row["exact_mass"], row["monoisotopic_mass"],
+                                                 row["molecular_formula"], row["xlogp3"])
+                                                for _, row in cands.iterrows()
+                                            ])
+
                         # Meta-information about the scored spectra
                         conn_mb.execute("INSERT OR IGNORE INTO scored_spectra_meta VALUES (?, ?, ?, ?, ?, ?, ?)",
                                         (
@@ -223,23 +254,18 @@ if __name__ == "__main__":
                                             meta_info["retention_time"]
                                         ))
 
-                        # Molecule structures associated with the candidates
-                        conn_mb.executemany("INSERT OR IGNORE INTO molecules VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        # SIRIUS serves as basis for the candidate sets
+                        conn_mb.executemany("INSERT INTO candidates_spectra VALUES (?, ?)",
                                             [
-                                                (row["cid__PUBCHEM"], row["InChI__PUBCHEM"], row["InChIKey__PUBCHEM"],
-                                                 row["InChIKey_1__PUBCHEM"], row["InChIKey_2__PUBCHEM"],
-                                                 row["SMILES_ISO__PUBCHEM"], row["SMILES_CAN__PUBCHEM"],
-                                                 row["exact_mass__PUBCHEM"], row["monoisotopic_mass__PUBCHEM"],
-                                                 row["molecular_formula__PUBCHEM"], row["xlogp3"])
-                                                for _, row in cands.iterrows()
+                                                (meta_info["accession"], row["cid"]) for _, row in cands.iterrows()
                                             ])
 
                         # CSI:FingerID candidate scores
                         conn_mb.executemany(
                             "INSERT INTO spectra_candidate_scores VALUES (?, ?, ?, ?, ?)",
                             [
-                                (meta_info["accession"], row["cid__PUBCHEM"], meta_info["dataset"],
-                                 "sirius__sd__correct_mf", row["score__SIRIUS"])
+                                (meta_info["accession"], row["cid"], "sirius__sd__correct_mf", meta_info["dataset"],
+                                 row["score"])
                                 for _, row in cands.iterrows()
                             ]
                         )
@@ -255,9 +281,9 @@ if __name__ == "__main__":
                         conn_mb.executemany(
                             "INSERT OR IGNORE INTO fingerprints_data VALUES (?, ?, ?)",
                             [
-                                (row["cid__PUBCHEM"],
-                                 ",".join(map(str, [idx for idx, fp in enumerate(row["fingerprint"]) if fp == "1"])),
-                                 "sirius_fps")
+                                (row["cid"],
+                                 "sirius_fps",
+                                 ",".join(map(str, [idx for idx, fp in enumerate(row["fingerprint"]) if fp == "1"])))
                                 for _, row in cands.iterrows()
                             ]
                         )
