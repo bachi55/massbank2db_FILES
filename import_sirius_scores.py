@@ -51,6 +51,8 @@ CH.setFormatter(FORMATTER)
 LOGGER.addHandler(CH)
 # ================
 
+DISCONNECTED_PATTER = re.compile(r"^[0-9]+.*")
+
 
 def create_tables(conn: sqlite3.Connection):
     conn.execute("CREATE TABLE IF NOT EXISTS scored_spectra_meta ("
@@ -201,6 +203,7 @@ if __name__ == "__main__":
                     cands = pd.read_csv(score_archive.extractfile(entry), sep="\t")  # type: pd.DataFrame
                     LOGGER.info("[%s] Number of candidates (SIRIUS): %d" % (spec_id, len(cands)))
 
+                    # Here we add the stereo-isomers for each 2D structure
                     cands = pd.merge(
                         left=cands,
                         right=pd.read_sql(
@@ -212,6 +215,20 @@ if __name__ == "__main__":
                         ),
                         left_on="inchikey", right_on="InChIKey_1", how="inner", suffixes=("__SIRIUS", "__PUBCHEM")
                     )
+                    LOGGER.info("[%s] Number of candidates (with PubChem match): %d" % (spec_id, len(cands)))
+
+                    # --------------------------------------------------------------
+                    # Filter candidates: Implemented as done in the MetFrag software
+                    is_not_isotopic = cands["InChI"].apply(lambda x: "/i" not in x)  # isotopic
+
+                    is_connected = cands["molecular_formula"].apply(
+                        lambda x: ("." not in x) and (DISCONNECTED_PATTER.match(x) is None))  # disconnected
+
+                    cands = cands[is_not_isotopic & is_connected]
+
+                    LOGGER.info("[%s] Filtering removed %d candidates." %
+                                (spec_id, (~ (is_not_isotopic & is_connected)).sum()))
+                    # --------------------------------------------------------------
 
                     if meta_info["pubchem_id"] not in cands["cid"].to_list():
                         LOGGER.error("[%s] Correct molecular structure (cid = %d) is not in the candidate set."
@@ -223,8 +240,6 @@ if __name__ == "__main__":
                         LOGGER.error("[{}] Correct molecular formula is not on the candidate set: {} not in {}."
                                      .format(spec_id, meta_info["molecular_formula"], _unq_mf))
                         continue
-
-                    LOGGER.info("[%s] Number of candidates (with PubChem match): %d" % (spec_id, len(cands)))
 
                     if len(_unq_mf) > 1:
                         LOGGER.warning("[{}] There is more than one molecular formula in the candidate set: {}."
