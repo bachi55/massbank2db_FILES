@@ -24,13 +24,13 @@
 #
 ####
 import os
+import sys
 import gzip
 import glob
 import sqlite3
 import logging
 import argparse
 import pandas as pd
-
 
 from massbank2db.db import MassbankDB
 
@@ -73,14 +73,14 @@ if __name__ == "__main__":
             LOGGER.info("[%s] Process spectrum: %s (%05d / %05d)" % (dataset, spec_id, idx + 1, len(fn_list)))
 
             # Load candidates for current spectrum
-            df = pd.read_csv(
+            df = pd.read_sql(
                 "SELECT monoisotopic_mass, inchi as InChI, cid, inchikey as InChIKey, molecular_formula, smiles_can"
                 "   FROM (SELECT candidate FROM candidates_spectra WHERE spectrum IS '%s') "
                 "   INNER JOIN molecules ON molecules.cid = candidate "
                 "   GROUP BY inchikey1" % spec_id, conn)
 
             # Prepare candidates for MetFrag
-            cands = MassbankDB.candidates_to_metfrag_format(df, smiles_column="smiles_can")
+            cands = MassbankDB.candidates_to_metfrag_format(df, smiles_column="smiles_can", return_as_str=False)
 
             # Write candidate lists out (ready to be used by MetFrag)
             ofn = fn.replace(os.extsep + "peaks", os.extsep + "cands")
@@ -93,3 +93,5 @@ if __name__ == "__main__":
 
     finally:
         conn.close()
+
+    sys.exit(0)
