@@ -43,8 +43,13 @@ def write_ms_and_cand_files(ds, n_compounds):
     # Handle different output formats
     if args.output_format.lower() == "sirius":
         merge_peak_lists = False
-    elif args.output_format.lower() == "metfrag":
+        normalize_peaks_before_merge = None
+    elif args.output_format == "metfrag":
         merge_peak_lists = True
+        normalize_peaks_before_merge = True
+    elif args.output_format == "metfrag__norm_after_merge":
+        merge_peak_lists = True
+        normalize_peaks_before_merge = False
     else:
         raise ValueError("Unsupported output format: '%s'" % args.output_format)
 
@@ -56,15 +61,15 @@ def write_ms_and_cand_files(ds, n_compounds):
                 mb_db.iter_spectra(dataset=ds, grouped=True, return_candidates=args.return_candidates,
                                    pc_dbfn=args.pubchem_db_fn)),
                 total=n_compounds):
-
             # Merge spectra meta-information (e.g. precursor-mz, retention-time) and peaks (if desired) into a single
             # spectrum.
-            spec = MBSpectrum.merge_spectra(specs, merge_peak_lists=merge_peak_lists)
+            spec = MBSpectrum.merge_spectra(
+                specs, merge_peak_lists=merge_peak_lists, normalize_peaks_before_merge=normalize_peaks_before_merge)
 
-            if args.output_format.lower() == "sirius":
+            if args.output_format == "sirius":
                 # Output in SIRIUS (.ms) format
                 output = spec.to_sirius_format(molecular_candidates=cands, add_gt_molecular_formula=True)
-            elif args.output_format.lower() == "metfrag":
+            elif args.output_format.startswith("metfrag"):
                 # Output in MetFrag format
                 try:
                     output = spec.to_metfrag_format(molecular_candidates=cands,
@@ -106,7 +111,7 @@ def parse_cli_arguments():
     arg_parser.add_argument("massbank_db_fn", help="Filepath of the Massbank database.")
     arg_parser.add_argument("output_format",
                             help="Set the output format for the desired In-silico tool, e.g. SIRIUS or MetFrag.",
-                            choices=["sirius", "SIRIUS", "metfrag", "MetFrag", "METFRAG"])
+                            choices=["sirius", "metfrag", "metfrag__norm_after_merge"])
     arg_parser.add_argument("odir", help="Path to the output directory.")
 
     arg_parser.add_argument(
@@ -144,4 +149,3 @@ if __name__ == "__main__":
         if args.datasets is None or ds in args.datasets:
             print("\nProcess: %s (%d/%d) with %d compounds" % (ds, idx + 1, len(ds_ncmp), ncmp))
             write_ms_and_cand_files(ds, ncmp)
-
