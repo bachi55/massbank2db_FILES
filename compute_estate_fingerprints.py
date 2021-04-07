@@ -105,7 +105,7 @@ if __name__ == "__main__":
                              (name, fp_type, fp_mode, param, library, length, is_folded, hash_keys))
 
         # Get all molecular candidate structures from the DB
-        rows = conn.execute("SELECT cid, smiles_can FROM molecules").fetchall()
+        rows = conn.execute("SELECT cid, %s FROM molecules" % args.molecule_representation).fetchall()
 
         # Compute fingerprints
         res = Parallel(n_jobs=args.n_jobs, backend="multiprocessing")(
