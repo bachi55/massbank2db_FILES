@@ -24,14 +24,31 @@
 #
 ####
 import sqlite3
+import logging
 import argparse
 import more_itertools as mit
 
 from joblib.parallel import delayed, Parallel
 
 from rdkit.Chem.EState.Fingerprinter import FingerprintMol as EStateFingerprinter
-from rdkit.Chem import MolFromSmiles
+from rdkit.Chem import MolFromSmiles, SanitizeFlags, SanitizeMol
 from rdkit import __version__ as rdkit_version
+
+
+# ================
+# Setup the Logger
+LOGGER = logging.getLogger("Compute EState Fingerprints")
+LOGGER.setLevel(logging.INFO)
+LOGGER.propagate = False
+
+CH = logging.StreamHandler()
+CH.setLevel(logging.INFO)
+
+FORMATTER = logging.Formatter('[%(levelname)s] %(name)s : %(message)s')
+CH.setFormatter(FORMATTER)
+
+LOGGER.addHandler(CH)
+# ================
 
 
 def get_fp_meta_data(fingerprint_definition: str):
@@ -66,12 +83,45 @@ def get_fingerprints(batch):
 
     # Computer fingerprints and convert into index-strings
     for cid, smi in batch:
-        cids.append(cid)
+        # Get RDKit mol-object: that might fails
+        mol = MolFromSmiles(smi)
 
-        res = EStateFingerprinter(MolFromSmiles(smi))
+        if mol is None:
+            LOGGER.warning("[cid = %d] Cannot get mol-object for '%s'. Retry using 'sanitize=False'." % (cid, smi))
 
-        fp_cnt.append(",".join(["%d:%d" % (i, c) for i, c in enumerate(res[0]) if c > 0]))
-        fp_idc.append(",".join(["%d:%f" % (i, r) for i, r in enumerate(res[1]) if r != 0]))
+            # Approach taking from th RDKit cookbook:
+            # http://rdkit.org/docs/Cookbook.html#explicit-valence-error-partial-sanitization
+            mol = MolFromSmiles(smi, sanitize=False)
+            mol.UpdatePropertyCache(strict=False)
+            san_ret = SanitizeMol(
+                mol,
+                SanitizeFlags.SANITIZE_FINDRADICALS |
+                SanitizeFlags.SANITIZE_KEKULIZE |
+                SanitizeFlags.SANITIZE_SETAROMATICITY |
+                SanitizeFlags.SANITIZE_SETCONJUGATION |
+                SanitizeFlags.SANITIZE_SETHYBRIDIZATION |
+                SanitizeFlags.SANITIZE_SYMMRINGS,
+                catchErrors=True
+            )
+
+            if san_ret != SanitizeFlags.SANITIZE_NONE:
+                LOGGER.error("[cid = {}] Cannot get mol-object for '{}'. Manual sanitization failed: {}."
+                             .format(cid, smi, san_ret))
+                continue
+
+            if mol is None:
+                LOGGER.error("[cid = %d] Cannot get mol-object for '%s'." % (cid, smi))
+                continue
+
+        try:
+            res = EStateFingerprinter(mol)
+
+            cids.append(cid)
+            fp_cnt.append(",".join(["%d:%d" % (i, c) for i, c in enumerate(res[0]) if c > 0]))
+            fp_idc.append(",".join(["%d:%f" % (i, r) for i, r in enumerate(res[1]) if r != 0]))
+        except RuntimeError as err:
+            LOGGER.error("[cid = %d] Cannot compute estate-fingerprint for '%s'." % (cid, smi))
+            LOGGER.error(err)
 
     return cids, fp_cnt, fp_idc
 
