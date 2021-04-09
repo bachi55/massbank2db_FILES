@@ -52,26 +52,14 @@ LOGGER.addHandler(CH)
 
 
 def get_fp_meta_data(fingerprint_definition: str):
-    if fingerprint_definition == "estate_idc":
-        name = fingerprint_definition
-        fp_type = "estate"
-        fp_mode = "real"
-        param = "molecule_presentation=%s" % args.molecule_representation
-        library = ":".join(["RDKit", rdkit_version])
-        length = 79
-        is_folded = 0
-        hash_keys = None
-    elif fingerprint_definition == "estate_cnt":
-        name = fingerprint_definition
-        fp_type = "estate"
-        fp_mode = "count"
-        param = "molecule_presentation=%s" % args.molecule_representation
-        library = ":".join(["RDKit", rdkit_version])
-        length = 79
-        is_folded = 0
-        hash_keys = None
-    else:
-        raise ValueError("Invalid fingerprint definition: '%s'" % fingerprint_definition)
+    name = fingerprint_definition
+    fp_type = "estate"
+    fp_mode = "real" if fingerprint_definition == "estate_idc" else "count"
+    param = ": ".join(["molecule_presentation", args.molecule_representation])
+    library = ": ".join(["RDKit", rdkit_version])
+    length = 79
+    is_folded = 0
+    hash_keys = None
 
     return name, fp_type, fp_mode, param, library, length, is_folded, hash_keys
 
@@ -134,7 +122,7 @@ if __name__ == "__main__":
                             help="Number of parallel jobs used to compute the fingerprints.")
     arg_parser.add_argument("--batch_size", type=int, default=1024,
                             help="Size of the batches in which the fingerprints are computed and inserted to the DB.")
-    arg_parser.add_argument("--molecule-representation", type=str, default="smiles_can",
+    arg_parser.add_argument("--molecule_representation", type=str, default="smiles_can",
                             choices=["smiles_can", "smiles_iso"])
     args = arg_parser.parse_args()
 
