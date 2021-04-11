@@ -72,18 +72,7 @@ def get_fp_meta_data(fprinter: CircularFPFeaturizer):
 
 def get_fingerprints(batch, fprinter):
     cids, smis = map(list, zip(*batch))
-
-    fps_mat = fprinter.transform(smis)  # type: csr_matrix
-
-    fps_out = [
-        ",".join([
-            "%d:%d" % (c, fps_mat[i, c])
-            for c in fps_mat.getrow(i).nonzero()[1]
-        ])
-        for i in range(fps_mat.shape[0])
-    ]
-
-    return cids, fps_out
+    return cids, fprinter.transform(smis)
 
 
 if __name__ == "__main__":
@@ -125,7 +114,7 @@ if __name__ == "__main__":
         # Train the circular fingerprinter
         fprinter = CircularFPFeaturizer(
             fp_type=args.fp_type, only_freq_subs=True, min_subs_freq=min_subs_freq, n_jobs=args.n_jobs, radius=3,
-            use_chirality=True
+            use_chirality=True, output_format="sparse_string"
         ).fit([row[0] for row in rows])
         LOGGER.info("Size of frequent hash set: %d" % len(fprinter))
 
