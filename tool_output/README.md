@@ -23,4 +23,20 @@ stereo-chemistry.
 
 ### SIRIUS
 
+Dr. Kai Dührkop ran CSI:FingerID to predict the candidate scores in a structure disjoint (sd) fashion. That means, 
+the ground truth molecular structured associated with the Massbank spectra have not been used for training.
+The correct molecular formula was used to construct the candidate sets.
+
+### MetFrag
+
+
+
+#### 
+
+The [MetFrag software](https://ipb-halle.github.io/MetFrag/projects/metfragcl/) (in version 2.4.5) was used to 
+calculate in-silico MS2 scores for predefined candidate sets. The 'FragmenterScore' was used as MS2 score, abs. mass 
+dev. was set to 0.0001, rel. mass dev. was set to 5, and the maximum tree depth was 2. If multiple collision energies 
+where available, the corresponding normalized (maximum intensity equals 100) MS2 spectra have been merged using the '
+[mzClust_hclust](https://github.com/sneumann/xcms/blob/master/src/mzClust_hclust.c)' function from [XCMS](https://github.com/sneumann/xcms).
+
 ### MetFrag

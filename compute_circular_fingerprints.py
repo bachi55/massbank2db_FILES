@@ -28,8 +28,6 @@ import logging
 import argparse
 import more_itertools as mit
 
-from scipy.sparse import csr_matrix
-
 from rdkit import __version__ as rdkit_version
 
 from rosvm.feature_extraction.featurizer_cls import CircularFPFeaturizer

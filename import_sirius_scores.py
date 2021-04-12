@@ -61,9 +61,9 @@ def create_tables(conn: sqlite3.Connection):
                  "  original_accessions VARCHAR NOT NULL,"
                  "  precursor_mz        REAL NOT NULL,"
                  "  precursor_type      VARCHAR NOT NULL,"
-                 "  cid                 INTEGER NOT NULL,"
+                 "  molecule            INTEGER NOT NULL,"
                  "  retention_time      REAL NOT NULL,"
-                 "  FOREIGN KEY (cid) REFERENCES molecules(cid),"
+                 "  FOREIGN KEY (molecule) REFERENCES molecules(cid),"
                  "  FOREIGN KEY (dataset) REFERENCES datasets(name))")
 
     conn.execute("CREATE TABLE IF NOT EXISTS candidates_spectra ("
@@ -174,7 +174,7 @@ if __name__ == "__main__":
                 if entry.isreg():
                     # Found a spectrum ...
                     spectra_idx += 1
-                    spec_id = os.path.basename(entry.name).split(".")[0]  # e.g. AC01111385
+                    spec_id = os.path.basename(entry.name).split(os.path.extsep)[0]  # e.g. AC01111385
                     LOGGER.info("Process spectrum %05d: id = %s" % (spectra_idx, spec_id))
 
                     # ==================================
