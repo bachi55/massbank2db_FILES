@@ -106,12 +106,14 @@ def create_tables(conn: sqlite3.Connection):
                  "  length      INTEGER NOT NULL,"
                  "  is_folded   BOOLEAN NOT NULL,"
                  "  hash_keys   VARCHAR,"
+                 "  max_values  VARCHAR,"
                  "  CONSTRAINT type_mode_combination UNIQUE (type, mode, param))")
 
     conn.execute("CREATE TABLE IF NOT EXISTS fingerprints_data ("
                  "  molecule    INTEGER NOT NULL,"
                  "  name        VARCHAR NOT NULL,"
-                 "  fingerprint VARCHAR NOT NULL,"
+                 "  bits        VARCHAR NOT NULL,"
+                 "  vals      VARCHAR NOT NULL,"
                  "  FOREIGN KEY (molecule) REFERENCES molecules(cid),"
                  "  FOREIGN KEY (name) REFERENCES fingerprints_meta(name),"
                  "  PRIMARY KEY (molecule, name))")
@@ -133,7 +135,10 @@ def create_indices(conn: sqlite3.Connection):
 
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument("massbank_db_fn", help="Filepath of the Massbank database.")
+    arg_parser.add_argument(
+        "massbank_db_fn",
+        help="Pathname of the Massbank database used as a basis to construct the new DB."
+    )
     arg_parser.add_argument("idir")
     arg_parser.add_argument("score_tgz_fn")
     arg_parser.add_argument(
@@ -141,11 +146,29 @@ if __name__ == "__main__":
         default="/home/bach/Documents/doctoral/projects/local_pubchem_db/db_files/pubchem_01-02-2021.sqlite",
         type=str,
         help="Filepath of the PubChem database.")
+    arg_parser.add_argument(
+        "--build_unittest_db",
+        action="store_true",
+        help="Use this option to create a smaller database (subset of SIRIUS scores) that we can use for unitttests."
+    )
     args = arg_parser.parse_args()
 
     sqlite3.register_adapter(np.int64, int)
 
-    conn_mb = sqlite3.connect(args.massbank_db_fn)
+    # Copy the base DB to a new file (which will get the SIRIUS scores)
+    conn_mb_original = sqlite3.connect("file:" + args.massbank_db_fn + "?mode=ro", uri=True)
+    conn_mb = sqlite3.connect(
+        os.path.join(
+            os.path.dirname(args.massbank_db_fn),
+            "Massbank_test_db.sqlite" if args.build_unittest_db else "massbank__with_sirius.sqlite"
+        )
+    )
+    try:
+        with conn_mb:
+            conn_mb_original.backup(conn_mb)
+    finally:
+        conn_mb_original.close()
+
     conn_pc = sqlite3.connect(args.pubchem_db_fn)
 
     prefix_pattern = re.compile(r"[A-Z]{2,3}")
@@ -158,8 +181,8 @@ if __name__ == "__main__":
             create_tables(conn_mb)
 
             conn_mb.execute("INSERT OR IGNORE INTO fingerprints_meta "
-                            "   VALUES (?, ?, ?, ?, DATETIME('now', 'localtime'), ?, ?, ?, ?)",
-                            ("sirius_fps", "UNION", "binary", None, "CDK: None", 3047, False, None))
+                            "   VALUES (?, ?, ?, ?, DATETIME('now', 'localtime'), ?, ?, ?, ?, ?)",
+                            ("sirius_fps", "UNION", "binary", None, "CDK: None", 3047, False, None, None))
 
             conn_mb.execute("INSERT OR IGNORE INTO scoring_methods VALUES (?, ?, ?)",
                             ("sirius__sd__correct_mf", "SIRIUS: 4, CSI:FingerID: 1.4.5",
@@ -176,6 +199,10 @@ if __name__ == "__main__":
                     spectra_idx += 1
                     spec_id = os.path.basename(entry.name).split(os.path.extsep)[0]  # e.g. AC01111385
                     LOGGER.info("Process spectrum %05d: id = %s" % (spectra_idx, spec_id))
+
+                    # For unittest DBs we only import a sub-set of the spectra
+                    if args.build_unittest_db and np.random.RandomState(spectra_idx).rand() > 0.0115:
+                        continue
 
                     # ==================================
                     # Find meta-information for spectrum
@@ -294,7 +321,7 @@ if __name__ == "__main__":
 
                         # CSI:FingerID fingerprints as index strings
                         conn_mb.executemany(
-                            "INSERT OR IGNORE INTO fingerprints_data VALUES (?, ?, ?)",
+                            "INSERT OR IGNORE INTO fingerprints_data(molecule, name, bits) VALUES (?, ?, ?)",
                             [
                                 (row["cid"],
                                  "sirius_fps",

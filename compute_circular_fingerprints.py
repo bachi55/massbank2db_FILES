@@ -27,6 +27,7 @@ import sqlite3
 import logging
 import argparse
 import more_itertools as mit
+import numpy as np
 
 from rdkit import __version__ as rdkit_version
 
@@ -56,6 +57,7 @@ def get_fp_meta_data(fprinter: CircularFPFeaturizer):
     name = "__".join([fp_type, fp_mode, args.key_training_set])  # e.g. ECFP__count__gt_structures
     param = ", ".join(["{}: {}".format(k, v) for k, v in fprinter.get_params(deep=False).items()])
     param += ", molecule_representation: %s" % args.molecule_representation
+    param += ", n_candidates_for_training: %d" % args.n_candidates_for_training
     library = ", ".join(["{}: {}".format(p, v) for p, v in [("rosvm", rosvm_version), ("RDKit", rdkit_version)]])
     length = fprinter.get_length()
     is_folded = int(fprinter.fp_mode == "binary_folded")
@@ -77,14 +79,18 @@ if __name__ == "__main__":
     # Read CLI arguments
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument("massbank_db_fn", help="Filepath of the Massbank database.")
-    arg_parser.add_argument("key_training_set", type=str, choices=["gt_structures", "random_candidates"])
     arg_parser.add_argument("fp_type", type=str, choices=["ECFP", "FCFP"])
     arg_parser.add_argument("--n_jobs", type=int, default=4,
                             help="Number of parallel jobs used to compute the fingerprints.")
+    arg_parser.add_argument("--key_training_set", type=str, choices=["gt_structures", "random_candidates", "all"],
+                            default="all")
     arg_parser.add_argument("--batch_size", type=int, default=2**14,
                             help="Size of the batches in which the fingerprints are computed and inserted to the DB.")
     arg_parser.add_argument("--molecule_representation", type=str, default="smiles_iso",
                             choices=["smiles_can", "smiles_iso"])
+    arg_parser.add_argument("--radius", default=2)
+    arg_parser.add_argument("--n_candidates_for_training", type=int, default=50000)
+    arg_parser.add_argument("--min_subs_freq", type=int, default=50)
     args = arg_parser.parse_args()
 
     # Open connection to database
@@ -95,50 +101,75 @@ if __name__ == "__main__":
             conn.execute("PRAGMA foreign_keys = ON")
 
         # Load the SMILES used to train the frequent circular fingerprint hashes
-        if args.key_training_set == "random_candidates":
-            rows = conn.execute(
-                "SELECT %s FROM molecules ORDER BY random() LIMIT 250000" % args.molecule_representation
+        rows = []
+
+        if args.key_training_set in ["random_candidates", "all"]:
+            rows += conn.execute(
+                "SELECT cid, %s FROM molecules ORDER BY random() LIMIT %d" %
+                (args.molecule_representation, args.n_candidates_for_training)
             ).fetchall()
-            min_subs_freq = 250
-        else:  # gt_structures
-            rows = conn.execute(
-                "SELECT m.%s FROM scored_spectra_meta "
-                "   INNER JOIN molecules m on scored_spectra_meta.cid = m.cid" % args.molecule_representation
+
+        if args.key_training_set in ["gt_structures", "all"]:
+            rows += conn.execute(
+                "SELECT cid, m.%s FROM scored_spectra_meta "
+                "   INNER JOIN molecules m on scored_spectra_meta.molecule = m.cid" % args.molecule_representation
             ).fetchall()
-            min_subs_freq = 25
 
         LOGGER.info("Number of SMILES used for training (%s): %d." % (args.key_training_set, len(rows)))
 
         # Train the circular fingerprinter
+        cids_train, smis_train = zip(*rows)
         fprinter = CircularFPFeaturizer(
-            fp_type=args.fp_type, only_freq_subs=True, min_subs_freq=min_subs_freq, n_jobs=args.n_jobs, radius=3,
-            use_chirality=True, output_format="sparse_string"
-        ).fit([row[0] for row in rows])
+            fp_type=args.fp_type, only_freq_subs=True, min_subs_freq=args.min_subs_freq, n_jobs=args.n_jobs,
+            radius=args.radius, use_chirality=True, output_format="dense"
+        ).fit(list(smis_train))
         LOGGER.info("Size of frequent hash set: %d" % len(fprinter))
 
         # Insert fingerprint meta-data
         with conn:
             name, fp_type, fp_mode, param, library, length, is_folded, hash_keys = get_fp_meta_data(fprinter)
+            param += ", cids: %s" % ";".join(map(str, cids_train))
+
             conn.execute(
                 "INSERT OR REPLACE INTO fingerprints_meta "
-                "  VALUES (?, ?, ?, ?, DATETIME('now', 'localtime'), ?, ?, ?, ?)",
-                (name, fp_type, fp_mode, param, library, length, is_folded, hash_keys)
+                "  VALUES (?, ?, ?, ?, DATETIME('now', 'localtime'), ?, ?, ?, ?, ?)",
+                (name, fp_type, fp_mode, param, library, length, is_folded, hash_keys, None)
             )
 
         # Get all molecular candidate structures from the DB
         rows = conn.execute("SELECT cid, %s FROM molecules" % args.molecule_representation).fetchall()
 
         # Compute and insert fingerprints
-        for batch in mit.chunked(rows, args.batch_size):
+        max_cnts = np.full(length, fill_value=-np.inf)
+        batches = list(mit.chunked(rows, args.batch_size))
+        for idx, batch in enumerate(batches):
+            LOGGER.info("Batch: %d/%d" % (idx + 1, len(batches)))
+
             cids, fps = get_fingerprints(batch, fprinter)
 
             with conn:
                 conn.executemany(
-                    "INSERT OR REPLACE INTO fingerprints_data VALUES (?, ?, ?)", zip(cids, len(cids) * [name], fps)
+                    "INSERT OR REPLACE INTO fingerprints_data VALUES (?, ?, ?, ?)",
+                    [
+                        (
+                            cid_i,
+                            name,
+                            ",".join(map(str, np.flatnonzero(fp_i))),
+                            ",".join(map(str, fp_i[fp_i != 0]))
+                        )
+                        for cid_i, fp_i in zip(cids, fps)
+                    ]
                 )
-                conn.executemany(
-                    "INSERT OR REPLACE INTO fingerprints_data VALUES (?, ?, ?)", zip(cids, len(cids) * [name], fps)
-                )
+
+            max_cnts = np.maximum(max_cnts, np.max(fps, axis=0))
+
+        # Insert statistics of the maximum count per feature dimension needed to convert the fingerprints to binary
+        # vectors later.
+        with conn:
+            conn.execute(
+                "UPDATE fingerprints_meta SET max_values = ? WHERE name IS ?",
+                (",".join(map(str, max_cnts.astype(int))), name)
+            )
 
     finally:
         conn.close()

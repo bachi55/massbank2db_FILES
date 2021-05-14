@@ -66,8 +66,10 @@ def get_fp_meta_data(fingerprint_definition: str):
 
 def get_fingerprints(batch):
     cids = []
-    fp_cnt = []
-    fp_idc = []
+    cnts_bits = []
+    cnts_vals = []
+    idc_bits = []
+    idc_vals = []
 
     # Computer fingerprints and convert into index-strings
     for cid, smi in batch:
@@ -105,13 +107,17 @@ def get_fingerprints(batch):
             res = EStateFingerprinter(mol)
 
             cids.append(cid)
-            fp_cnt.append(",".join(["%d:%d" % (i, c) for i, c in enumerate(res[0]) if c > 0]))
-            fp_idc.append(",".join(["%d:%f" % (i, r) for i, r in enumerate(res[1]) if r != 0]))
+
+            cnts_bits.append(",".join(["%d" % i for i, c in enumerate(res[0]) if c > 0]))
+            cnts_vals.append(",".join(["%d" % c for c in res[0] if c > 0]))
+
+            idc_bits.append(",".join(["%d" % i for i, r in enumerate(res[1]) if r != 0]))
+            idc_vals.append(",".join(["%f" % r for r in res[1] if r != 0]))
         except RuntimeError as err:
             LOGGER.error("[cid = %d] Cannot compute estate-fingerprint for '%s'." % (cid, smi))
             LOGGER.error(err)
 
-    return cids, fp_cnt, fp_idc
+    return cids, cnts_bits, cnts_vals, idc_bits, idc_vals
 
 
 if __name__ == "__main__":
@@ -139,8 +145,8 @@ if __name__ == "__main__":
                 get_fp_meta_data(fp_def) for fp_def in ["estate_idc", "estate_cnt"]
             ]:
                 conn.execute("INSERT OR REPLACE INTO fingerprints_meta "
-                             "  VALUES (?, ?, ?, ?, DATETIME('now', 'localtime'), ?, ?, ?, ?)",
-                             (name, fp_type, fp_mode, param, library, length, is_folded, hash_keys))
+                             "  VALUES (?, ?, ?, ?, DATETIME('now', 'localtime'), ?, ?, ?, ?, ?)",
+                             (name, fp_type, fp_mode, param, library, length, is_folded, hash_keys, None))
 
         # Get all molecular candidate structures from the DB
         rows = conn.execute("SELECT cid, %s FROM molecules" % args.molecule_representation).fetchall()
@@ -152,12 +158,14 @@ if __name__ == "__main__":
 
         # Insert fingerprints
         with conn:
-            for cids, fps_cnt, fps_idc in res:
+            for cids, cnts_bits, cnts_vals, idc_bits, idc_vals in res:
                 conn.executemany(
-                    "INSERT INTO fingerprints_data VALUES (?, ?, ?)", zip(cids, len(cids) * ["estate_cnt"], fps_cnt)
+                    "INSERT INTO fingerprints_data VALUES (?, ?, ?, ?)",
+                    zip(cids, len(cids) * ["estate_cnt"], cnts_bits, cnts_vals)
                 )
                 conn.executemany(
-                    "INSERT INTO fingerprints_data VALUES (?, ?, ?)", zip(cids, len(cids) * ["estate_idc"], fps_idc)
+                    "INSERT INTO fingerprints_data VALUES (?, ?, ?, ?)",
+                    zip(cids, len(cids) * ["estate_idc"], idc_bits, idc_vals)
                 )
 
     finally:
