@@ -53,6 +53,11 @@ if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument("massbank_db_fn", help="Filepath of the Massbank database.")
     arg_parser.add_argument("idir", help="Input directory containing the MetFrag scores.")
+    arg_parser.add_argument(
+        "--build_unittest_db",
+        action="store_true",
+        help="Use this option to create a smaller database (subset of SIRIUS scores) that we can use for unittests."
+    )
     args = arg_parser.parse_args()
 
     sqlite3.register_adapter(np.int64, int)
@@ -96,6 +101,12 @@ if __name__ == "__main__":
             LOGGER.info(
                 "Process spectrum %05d / %05d: id = %s, dataset = %s" % (idx + 1, len(l_score_fns), spec_id, dataset)
             )
+
+            if args.build_unittest_db \
+                    and not conn_mb.execute("SELECT accession FROM scored_spectra_meta WHERE accession IS ?", (spec_id, )) \
+                    .fetchall():
+                # In the unittest DB we only include MetFrag scores for spectra that are already in the DB
+                continue
 
             # =====================================================================================
             # Load candidates and with MetFrag scores and combine with all stereo-isomers in the DB

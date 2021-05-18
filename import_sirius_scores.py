@@ -113,7 +113,7 @@ def create_tables(conn: sqlite3.Connection):
                  "  molecule    INTEGER NOT NULL,"
                  "  name        VARCHAR NOT NULL,"
                  "  bits        VARCHAR NOT NULL,"
-                 "  vals      VARCHAR NOT NULL,"
+                 "  vals        VARCHAR,"
                  "  FOREIGN KEY (molecule) REFERENCES molecules(cid),"
                  "  FOREIGN KEY (name) REFERENCES fingerprints_meta(name),"
                  "  PRIMARY KEY (molecule, name))")
@@ -149,7 +149,7 @@ if __name__ == "__main__":
     arg_parser.add_argument(
         "--build_unittest_db",
         action="store_true",
-        help="Use this option to create a smaller database (subset of SIRIUS scores) that we can use for unitttests."
+        help="Use this option to create a smaller database (subset of SIRIUS scores) that we can use for unittests."
     )
     args = arg_parser.parse_args()
 
@@ -180,11 +180,11 @@ if __name__ == "__main__":
         with conn_mb:
             create_tables(conn_mb)
 
-            conn_mb.execute("INSERT OR IGNORE INTO fingerprints_meta "
+            conn_mb.execute("INSERT OR REPLACE INTO fingerprints_meta "
                             "   VALUES (?, ?, ?, ?, DATETIME('now', 'localtime'), ?, ?, ?, ?, ?)",
                             ("sirius_fps", "UNION", "binary", None, "CDK: None", 3047, False, None, None))
 
-            conn_mb.execute("INSERT OR IGNORE INTO scoring_methods VALUES (?, ?, ?)",
+            conn_mb.execute("INSERT OR REPLACE INTO scoring_methods VALUES (?, ?, ?)",
                             ("sirius__sd__correct_mf", "SIRIUS: 4, CSI:FingerID: 1.4.5",
                              "Dr. Kai Dührkop ran CSI:FingerID to predict the candidate scores in a structure disjoint "
                              "(sd) fashion. That means, the ground truth molecular structured associated with the "
@@ -201,7 +201,7 @@ if __name__ == "__main__":
                     LOGGER.info("Process spectrum %05d: id = %s" % (spectra_idx, spec_id))
 
                     # For unittest DBs we only import a sub-set of the spectra
-                    if args.build_unittest_db and np.random.RandomState(spectra_idx).rand() > 0.0115:
+                    if args.build_unittest_db and np.random.RandomState(spectra_idx).rand() > 0.005:
                         continue
 
                     # ==================================
@@ -323,9 +323,11 @@ if __name__ == "__main__":
                         conn_mb.executemany(
                             "INSERT OR IGNORE INTO fingerprints_data(molecule, name, bits) VALUES (?, ?, ?)",
                             [
-                                (row["cid"],
-                                 "sirius_fps",
-                                 ",".join(map(str, [idx for idx, fp in enumerate(row["fingerprint"]) if fp == "1"])))
+                                (
+                                    row["cid"],
+                                    "sirius_fps",
+                                    ",".join(map(str, [idx for idx, fp in enumerate(row["fingerprint"]) if fp == "1"]))
+                                )
                                 for _, row in cands.iterrows()
                             ]
                         )

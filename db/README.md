@@ -17,3 +17,59 @@ In the following we give a detailed description if these steps.
 
 We use the '[massbank2db](https://github.com/bachi55/massbank2db)' Python package (in version 0.6.1) to build the 
 initial database containing the MS/MS spectra plus meta-data. All data in the 
+
+
+
+
+# Rebuilding the DB
+
+## Import SIRIUS scores
+
+SIRIUS scores serve as reference for candidate sets.
+
+```bash
+python import_sirius_scores.py \
+  db/massbank__2020.11__v0.6.1.sqlite \
+  tool_output/sirius \
+  scores.tar.gz \
+  --build_unittest_db
+```
+
+Outputs "DB_FILE.sqlite"
+
+## Get Candidate Sets for MetFrag
+
+Candidate sets for MetFrag are generated from the SIRIUS candidates sets.
+
+```bash
+python get_metfrag_candidates.py \
+  db/DB_FILE.sqlite \
+  tool_output/metfrag \
+  --gzip
+```
+
+## Import MetFrag Scores
+
+```bash
+python import_metfrag_scores.py \
+  db/DB_FILE.sqlite \
+  tool_output/metfrag__norm_after_merge
+```
+
+## Compute Circular Fingerprints
+
+```bash
+python compute_circular_fingerprints.py \
+  db/DB_FILE.sqlite \
+  FCFP \
+  --batch_size=100000 \
+  --min_subs_freq=100
+```
+
+## Convert circular counting fingerprints to binary
+
+```bash
+python convert_to_binary_fingerprints.py \
+  db/DB_FILE.sqlite \
+  FCFP
+```
