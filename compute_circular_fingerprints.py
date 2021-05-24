@@ -139,6 +139,14 @@ if __name__ == "__main__":
         # Get all molecular candidate structures from the DB
         rows = conn.execute("SELECT cid, %s FROM molecules" % args.molecule_representation).fetchall()
 
+        # Insert table for the new fingerprints
+        with conn:
+            conn.execute("CREATE TABLE IF NOT EXISTS fingerprints_data__%s("
+                         "  molecule    INTEGER NOT NULL PRIMARY KEY,"
+                         "  bits        VARCHAR NOT NULL,"
+                         "  vals        VARCHAR,"
+                         "  FOREIGN KEY (molecule) REFERENCES molecules(cid))" % name)
+
         # Compute and insert fingerprints
         max_cnts = np.full(length, fill_value=-np.inf)
         batches = list(mit.chunked(rows, args.batch_size))
@@ -149,11 +157,10 @@ if __name__ == "__main__":
 
             with conn:
                 conn.executemany(
-                    "INSERT OR REPLACE INTO fingerprints_data VALUES (?, ?, ?, ?)",
+                    "INSERT INTO fingerprints_data__%s VALUES (?, ?, ?)" % name,
                     [
                         (
                             cid_i,
-                            name,
                             ",".join(map(str, np.flatnonzero(fp_i))),
                             ",".join(map(str, fp_i[fp_i != 0]))
                         )
@@ -169,6 +176,12 @@ if __name__ == "__main__":
             conn.execute(
                 "UPDATE fingerprints_meta SET max_values = ? WHERE name IS ?",
                 (",".join(map(str, max_cnts.astype(int))), name)
+            )
+
+        # Create index on the molecules
+        with conn:
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS fpd__molecule__%s ON fingerprints_data__%s(molecule)" % (name, name)
             )
 
     finally:

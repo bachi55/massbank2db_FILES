@@ -151,6 +151,15 @@ if __name__ == "__main__":
         # Get all molecular candidate structures from the DB
         rows = conn.execute("SELECT cid, %s FROM molecules" % args.molecule_representation).fetchall()
 
+        # Insert separate table for all the fingerprints
+        with conn:
+            for name in ["estate_idc", "estate_cnt"]:
+                conn.execute("CREATE TABLE IF NOT EXISTS fingerprints_data__%s("
+                             "  molecule    INTEGER NOT NULL PRIMARY KEY,"
+                             "  bits        VARCHAR NOT NULL,"
+                             "  vals        VARCHAR,"
+                             "  FOREIGN KEY (molecule) REFERENCES molecules(cid))" % name)
+
         # Compute fingerprints
         res = Parallel(n_jobs=args.n_jobs, backend="multiprocessing")(
             delayed(get_fingerprints)(batch) for batch in mit.chunked(rows, args.batch_size)
@@ -160,12 +169,19 @@ if __name__ == "__main__":
         with conn:
             for cids, cnts_bits, cnts_vals, idc_bits, idc_vals in res:
                 conn.executemany(
-                    "INSERT INTO fingerprints_data VALUES (?, ?, ?, ?)",
-                    zip(cids, len(cids) * ["estate_cnt"], cnts_bits, cnts_vals)
+                    "INSERT INTO fingerprints_data__estate_idc VALUES (?, ?,?)",
+                    zip(cids, idc_bits, idc_vals)
                 )
                 conn.executemany(
-                    "INSERT INTO fingerprints_data VALUES (?, ?, ?, ?)",
-                    zip(cids, len(cids) * ["estate_idc"], idc_bits, idc_vals)
+                    "INSERT INTO fingerprints_data__estate_cnt VALUES (?, ?, ?)",
+                    zip(cids, cnts_bits, cnts_vals)
+                )
+
+        # Create index on the molecules
+        with conn:
+            for name in ["estate_idc", "estate_cnt"]:
+                conn.execute(
+                    "CREATE INDEX IF NOT EXISTS fpd__molecule__%s ON fingerprints_data__%s(molecule)" % (name, name)
                 )
 
     finally:

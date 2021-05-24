@@ -109,14 +109,11 @@ def create_tables(conn: sqlite3.Connection):
                  "  max_values  VARCHAR,"
                  "  CONSTRAINT type_mode_combination UNIQUE (type, mode, param))")
 
-    conn.execute("CREATE TABLE IF NOT EXISTS fingerprints_data ("
-                 "  molecule    INTEGER NOT NULL,"
-                 "  name        VARCHAR NOT NULL,"
+    conn.execute("CREATE TABLE IF NOT EXISTS fingerprints_data__sirius_fps ("
+                 "  molecule    INTEGER NOT NULL PRIMARY KEY,"
                  "  bits        VARCHAR NOT NULL,"
                  "  vals        VARCHAR,"
-                 "  FOREIGN KEY (molecule) REFERENCES molecules(cid),"
-                 "  FOREIGN KEY (name) REFERENCES fingerprints_meta(name),"
-                 "  PRIMARY KEY (molecule, name))")
+                 "  FOREIGN KEY (molecule) REFERENCES molecules(cid))")
 
 
 def create_indices(conn: sqlite3.Connection):
@@ -129,8 +126,7 @@ def create_indices(conn: sqlite3.Connection):
 
     conn.execute("CREATE INDEX IF NOT EXISTS cs__spectrum ON candidates_spectra(spectrum)")
 
-    conn.execute("CREATE INDEX IF NOT EXISTS fpd__molecule ON fingerprints_data(molecule)")
-    conn.execute("CREATE INDEX IF NOT EXISTS fpd__name ON fingerprints_data(name)")
+    conn.execute("CREATE INDEX IF NOT EXISTS fpd__molecule__sirius_fps ON fingerprints_data__sirius_fps(molecule)")
 
 
 if __name__ == "__main__":
@@ -321,11 +317,10 @@ if __name__ == "__main__":
 
                         # CSI:FingerID fingerprints as index strings
                         conn_mb.executemany(
-                            "INSERT OR IGNORE INTO fingerprints_data(molecule, name, bits) VALUES (?, ?, ?)",
+                            "INSERT OR IGNORE INTO fingerprints_data__sirius_fps(molecule, bits) VALUES (?, ?)",
                             [
                                 (
                                     row["cid"],
-                                    "sirius_fps",
                                     ",".join(map(str, [idx for idx, fp in enumerate(row["fingerprint"]) if fp == "1"]))
                                 )
                                 for _, row in cands.iterrows()

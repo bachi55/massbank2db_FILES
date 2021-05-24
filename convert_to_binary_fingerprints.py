@@ -105,6 +105,14 @@ if __name__ == "__main__":
                 (fp_name_new, args.fp_type, "binary", params, library, -1, 0, None, None)
             )
 
+        # 4) Create table for the fingerprint data
+        with conn:
+            conn.execute("CREATE TABLE IF NOT EXISTS fingerprints_data__%s("
+                         "  molecule    INTEGER NOT NULL PRIMARY KEY,"
+                         "  bits        VARCHAR NOT NULL,"
+                         "  vals        VARCHAR,"
+                         "  FOREIGN KEY (molecule) REFERENCES molecules(cid))" % fp_name_new)
+
         # ---------------------
         # Binarize Fingerprints
         # ---------------------
@@ -123,11 +131,10 @@ if __name__ == "__main__":
 
             with conn:
                 conn.executemany(
-                    "INSERT OR REPLACE INTO fingerprints_data(molecule, name, bits) VALUES (?, ?, ?)",
+                    "INSERT INTO fingerprints_data__%s(molecule, bits) VALUES (?, ?)" % fp_name_new,
                     [
                         (
                             cid,
-                            fp_name_new,
                             ",".join(map(str, np.flatnonzero(fp_i)))
                         )
                         for cid, fp_i in zip(cids, X_trans)
@@ -138,6 +145,12 @@ if __name__ == "__main__":
 
         with conn:
             conn.execute("UPDATE fingerprints_meta SET length = ? WHERE name IS ?", (len(trans), fp_name_new))
+
+        # Create the index on the molecules
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS fpd__molecule__%s ON fingerprints_data__%s(molecule)" %
+            (fp_name_new, fp_name_new)
+        )
 
     finally:
         conn.close()
