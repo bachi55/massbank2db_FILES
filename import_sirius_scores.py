@@ -70,14 +70,14 @@ def create_tables(conn: sqlite3.Connection):
                  "  spectrum        VARCHAR NOT NULL,"
                  "  candidate       INT NOT NULL,"
                  "  FOREIGN KEY (candidate) REFERENCES molecules(cid),"
-                 "  FOREIGN KEY (spectrum) REFERENCES scored_spectra_meta(accession),"
+                 "  FOREIGN KEY (spectrum) REFERENCES scored_spectra_meta(accession) ON DELETE CASCADE,"
                  "  CONSTRAINT spectrum_candidate_combination UNIQUE (spectrum, candidate))")
 
     conn.execute("CREATE TABLE IF NOT EXISTS merged_accessions ("
                  "  massbank_accession  VARCHAR PRIMARY KEY,"
                  "  merged_accession    VARCHAR NOT NULL,"
                  "  FOREIGN KEY (massbank_accession) REFERENCES spectra_meta (accession),"
-                 "  FOREIGN KEY (merged_accession) REFERENCES scored_spectra_meta(accession))")
+                 "  FOREIGN KEY (merged_accession) REFERENCES scored_spectra_meta(accession) ON DELETE CASCADE)")
 
     conn.execute("CREATE TABLE IF NOT EXISTS scoring_methods ("
                  "  name        VARCHAR PRIMARY KEY,"
@@ -90,7 +90,7 @@ def create_tables(conn: sqlite3.Connection):
                  "  scoring_method  VARCHAR NOT NULL,"
                  "  dataset         VARCHAR NOT NULL,"
                  "  score           REAL NOT NULL,"
-                 "  FOREIGN KEY (spectrum) REFERENCES scored_spectra_meta(accession),"
+                 "  FOREIGN KEY (spectrum) REFERENCES scored_spectra_meta(accession) ON DELETE CASCADE,"
                  "  FOREIGN KEY (candidate) REFERENCES molecules(cid),"
                  "  FOREIGN KEY (dataset) REFERENCES datasets(name),"
                  "  FOREIGN KEY (scoring_method) REFERENCES scoring_methods(name),"
