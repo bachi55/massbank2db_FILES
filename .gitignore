@@ -5,3 +5,4 @@
 **/*.peaks
 **/*.csv*
 **/*.tar.gz
+__pycache__
