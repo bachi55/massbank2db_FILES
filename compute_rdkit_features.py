@@ -102,18 +102,24 @@ if __name__ == "__main__":
 
             conn.execute(
                 "CREATE TABLE IF NOT EXISTS descriptors_meta("
-                "   name        VARCHAR NOT NULL PRIMARY KEY,"
-                "   length      INTEGER NOT NULL,"
-                "   mode        VARCHAR NOT NULL,"
-                "   timestamp   VARCHAR NOT NULL,"
-                "   library     VARCHAR NOT NULL" 
+                "   name                VARCHAR NOT NULL PRIMARY KEY,"
+                "   length              INTEGER NOT NULL,"
+                "   mode                VARCHAR NOT NULL,"
+                "   timestamp           VARCHAR NOT NULL,"
+                "   library             VARCHAR NOT NULL,"
+                "   used_descriptors    VARCHAR NOT NULL"
                 ")"
             )
 
+            # Get the list of descriptors available in RDKit
+            l_rdkit_desc = sorted(Descriptors.descList)
             conn.execute(
                 "INSERT OR REPLACE INTO descriptors_meta "
-                "   VALUES ('%s', %d, 'real', DATETIME('now', 'localtime'), 'rosvm: %s, RDKit: %s')"
-                % (desc_name, len(Descriptors.descList), rosvm_version, rdkit_version)
+                "   VALUES ('%s', %d, 'real', DATETIME('now', 'localtime'), 'rosvm: %s, RDKit: %s', '%s')"
+                % (
+                    desc_name, len(l_rdkit_desc), rosvm_version, rdkit_version,
+                    ",".join([name for name, _ in l_rdkit_desc])
+                )
             )
 
             conn.execute(
