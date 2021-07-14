@@ -1,5 +1,10 @@
 # MassBank DB
 
+## "with_descriptors" (v4, ??.07.2021)
+
+- added Bouwmeester et al. (2019) molecular descriptors from RDKit
+- descriptors are added for 'smiles_iso' and 'smiles_can'
+
 ## "with_test_splits" (v3, 12.07.2021)
 
 - random splits test splits have been generated for all datasets

@@ -28,7 +28,7 @@ import os
 import sqlite3
 
 
-def get_backup_db(input_db_fn: str, postfix: str = "NEW", overwrite: bool = True) \
+def get_backup_db(input_db_fn: str, postfix: str = "NEW", exists: str = "overwrite") \
         -> sqlite3.Connection:
     """
     Copy the input database (DB) into a new DB. That is useful when we want to make modifications to a DB and keep the
@@ -38,7 +38,10 @@ def get_backup_db(input_db_fn: str, postfix: str = "NEW", overwrite: bool = True
 
     :param postfix: string, string appended to the original DB filename to create a output DB filename.
 
-    :param overwrite: boolean, indicating whether an existing output DB should be overwritten, if it exists.
+    :param exists: string, indicating what to do if the backup DB already exists:
+        "overwrite": Remove existing and re-create backup DB
+        "reuse": Simply open the existing backup DB
+        "raise": Raise an error if the backup DB already exisits
 
     :return: sqlite3.Connection, to the new DB
     """
@@ -53,16 +56,21 @@ def get_backup_db(input_db_fn: str, postfix: str = "NEW", overwrite: bool = True
 
     print("DB backup '%s' --> '%s'" % (ibasename, os.path.basename(ofn)))
 
+    # Handle existing backup DB
     if os.path.exists(ofn):
-        if overwrite:
+        if exists == "overwrite":
             os.remove(ofn)
-        else:
+        elif exists == "reuse":
+            oconn = sqlite3.connect(ofn)
+            return oconn
+        elif exists == "raise":
             raise RuntimeError("Output database already exists: '%s'" % ofn)
-
-    iconn = sqlite3.connect("file:" + input_db_fn + "?mode=ro", uri=True)
-    oconn = sqlite3.connect(ofn)
+        else:
+            raise ValueError("Invalid input for 'exists': %s" % exists)
 
     # Make backup
+    iconn = sqlite3.connect("file:" + input_db_fn + "?mode=ro", uri=True)
+    oconn = sqlite3.connect(ofn)
     iconn.backup(oconn)
 
     return oconn
