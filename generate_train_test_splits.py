@@ -37,7 +37,7 @@ if __name__ == "__main__":
     arg_parser.add_argument("massbank_db_fn", help="Filepath of the Massbank database.")
     args = arg_parser.parse_args()
 
-    conn = get_backup_db(args.massbank_db_fn, overwrite=True, postfix="with_test_splits")
+    conn = get_backup_db(args.massbank_db_fn, exists="overwrite", postfix="with_test_splits")
     try:
         # Read accessions
         df = pd.read_sql(
