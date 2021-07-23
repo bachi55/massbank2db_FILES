@@ -12,9 +12,9 @@ OUTPUT_DIR="/home/bach/Documents/doctoral/projects/massbank2db_FILES/tool_output
 parallel \
   --pipepart \
   --cat \
-  --jobs 12 \
+  --jobs 6 \
   --use-cores-instead-of-threads \
   --eta \
-  --block-size -1000 \
+  --block-size -250 \
   --arg-file "${INPUT_LIST}" \
   "mv {} {}.txt; nice -19 ./cfm-predict {}.txt 0.001 ${PARAM_FN} ${CONFIG_FN} 0 ${OUTPUT_DIR}; rm -f {}.txt"

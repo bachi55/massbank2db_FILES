@@ -6,3 +6,7 @@
 **/*.csv*
 **/*.tar.gz
 __pycache__
+**/ISOTOPE.DAT
+**/*.sqlite
+**/cfm-predict
+**/trained_models
