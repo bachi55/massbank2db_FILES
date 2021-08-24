@@ -11,3 +11,4 @@ __pycache__
 **/*.sqlite-journal
 **/cfm-predict
 **/trained_models
+.Rhistory
