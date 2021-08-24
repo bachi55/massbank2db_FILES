@@ -1,5 +1,10 @@
 # MassBank DB
 
+## "with_classyfire" (v5, 24.08.2021)
+
+- added the Classyfire molecule class classification for the groud
+  truth structures of the MassBank entries (not candidates)
+
 ## "with_descriptors" (v4, ??.07.2021)
 
 - added Bouwmeester et al. (2019) molecular descriptors from RDKit
