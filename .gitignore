@@ -8,5 +8,6 @@
 __pycache__
 **/ISOTOPE.DAT
 **/*.sqlite
+**/*.sqlite-journal
 **/cfm-predict
 **/trained_models

@@ -12,7 +12,7 @@ OUTPUT_DIR="/home/bach/Documents/doctoral/projects/massbank2db_FILES/tool_output
 parallel \
   --pipepart \
   --cat \
-  --jobs 6 \
+  --jobs 12 \
   --use-cores-instead-of-threads \
   --eta \
   --block-size -250 \

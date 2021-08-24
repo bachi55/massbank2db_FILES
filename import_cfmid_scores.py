@@ -25,23 +25,24 @@
 ####
 import sqlite3
 import argparse
-import gzip
-import tarfile
 import os
+import time
+
 import pandas as pd
 import logging
 import traceback
 import numpy as np
 
-from typing import List, Dict
+from typing import List, Dict, Union
 
 from matchms import Spectrum
 from matchms.similarity import ModifiedCosine
 from matchms.filtering import normalize_intensities
 
 from massbank2db.utils import get_precursor_mz
+from massbank2db.spectrum import MBSpectrum
 
-
+from utils import get_backup_db
 
 
 # ================
@@ -60,17 +61,23 @@ LOGGER.addHandler(CH)
 # ================
 
 
-def parse_cfm_spectrum(spec_str: List[str], meta_data: Dict):
+def parse_cfm_spectrum(spec_str: List[str], meta_data: Dict, return_mbspectrum: bool = False) \
+        -> Union[List[MBSpectrum], List[Spectrum]]:
     """
+    Function that parses an CFM-ID spectrum representation (text-file) into a list of spectra
 
-    :param spec_str:
-    :param meta_data:
-    :return:
+    :param spec_str: list of strings, lines of the CFM-ID spectrum file
+
+    :param meta_data: dictionary, meta data stored in the spectrum object
+
+    :param return_mbspectrum: boolean, indicating whether the spectrum object should be of type massbank2db.MBSpectrum
+        rather than matchms.Spectrum.
+
+    :return: list of spectrum objects, each energy (low, med and high) is stored in a separate spectrum object
     """
-    # Read in the spectra file in and parse into three (3) matchms.Spectrum objects
+    # Read in the spectra file in and parse into three (3) MBSpectrum objects
     mzs = []
     ints = []
-    i = 0
     for row in spec_str:
         if row == "\n":
             continue
@@ -84,7 +91,18 @@ def parse_cfm_spectrum(spec_str: List[str], meta_data: Dict):
 
     assert len(mzs) == 3, "CFM-ID predicts the spectra for three (3) collision energies."
 
-    specs = [Spectrum(np.array(_mzs), np.array(_ints), meta_data) for _mzs, _ints in zip(mzs, ints)]
+    # Create spectrum objects
+    if return_mbspectrum:
+        specs = []
+        for _mzs, _ints in zip(mzs, ints):
+            specs.append(MBSpectrum())
+            specs[-1].set_mz(_mzs)
+            specs[-1].set_int(_ints)
+
+            for k, v in meta_data.items():
+                specs[-1].set(k, v)
+    else:
+        specs = [Spectrum(np.array(_mzs), np.array(_ints), meta_data) for _mzs, _ints in zip(mzs, ints)]
 
     return specs
 
@@ -92,7 +110,14 @@ def parse_cfm_spectrum(spec_str: List[str], meta_data: Dict):
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument("massbank_db_fn", help="Filepath of the Massbank database.")
-    arg_parser.add_argument("idir", help="Input directory containing the predicted MS2 spectra.")
+    arg_parser.add_argument("idir", help="Input directory containing the measured MS2 spectra and meta-data.")
+
+    arg_parser.add_argument(
+        "--idir_pred_spec",
+        help="Input directory containing the predicted MS2 spectra.",
+        default=None,
+        type=str
+    )
     arg_parser.add_argument(
         "--build_unittest_db",
         action="store_true",
@@ -100,182 +125,252 @@ if __name__ == "__main__":
     )
     args = arg_parser.parse_args()
 
+    if args.idir_pred_spec is None:
+        args.idir_pred_spec = args.idir
+
     sqlite3.register_adapter(np.int64, int)
 
-    conn_mb = sqlite3.connect(args.massbank_db_fn)
+    conn = get_backup_db(args.massbank_db_fn, exists="reuse", postfix="with_cfm_id")
 
     try:
-        with conn_mb:
-            conn_mb.execute("PRAGMA foreign_keys = ON")
+        with conn:
+            conn.execute("PRAGMA foreign_keys = ON")
 
-        with conn_mb:
-            ms2scorer_name = os.path.split(args.idir.rstrip(os.path.sep))[-1]  # e.g. tool_output/metfrag/ --> metfrag
-            description = \
-                "The CFM-ID software (in version 2.0) was used to predict the MS2 spectra for all candidates " \
-                "associated with the MS2 spectra in Massbank. We use the single energy (se) pre-trained models from " \
-                "the online repository for the spectra prediction. The predictions are done in a structure disjoint " \
-                "fashion. That means, the pre-trained model for each Massbank spectrum (and its candidates) is chosen " \
-                "so that the ground truth structure was not part of the training. The similarity between the predicted " \
-                "and measured MS2 spectra is computed using the modified cosine similarity (matchms Python package, " \
-                "version 0.9.2). As in the original CFM-ID implementation, the similarity is computed for each energy " \
-                "separately and the scores are summed up. If multiple collision energies where available, the " \
-                "corresponding normalized (maximum intensity equals 100) MS2 spectra have been merged using the " \
-                "'mzClust_hclust' function from XCMS prior to the similarity scoring."
+        with conn:
+            ms2scorer_name = os.path.split(args.idir.rstrip(os.path.sep))[-1]  # e.g. tool_output/cfm-id/ --> cfm-id
+            ms2scorer_name = [ms2scorer_name + "__summed_up_sim__norm", ms2scorer_name + "__merge_pred_spec__norm"]
+            description = [
+                "The CFM-ID software (in version 2.0) was used to predict the MS2 spectra for all candidates \
+                associated with the MS2 spectra in Massbank. We use the single energy (se) pre-trained models from \
+                the online repository for the spectra prediction. The predictions are done in a structure disjoint \
+                fashion. That means, the pre-trained model for each Massbank spectrum (and its candidates) is chosen \
+                so that the ground truth structure was not part of the training. The similarity between the predicted \
+                and measured MS2 spectra is computed using the modified cosine similarity (matchms Python package, \
+                version 0.9.2). As in the original CFM-ID implementation, the similarity is computed for each energy \
+                separately and the scores are summed up. If the measured MassBank entry was available at multiple \
+                collision energies (i.e. we have multiple measured spectra for the same compound), MS2 spectra have \
+                been merged using the 'mzClust_hclust' function from XCMS prior to the similarity scoring.",
+                "The CFM-ID software (in version 2.0) was used to predict the MS2 spectra for all candidates \
+                associated with the MS2 spectra in Massbank. We use the single energy (se) pre-trained models from \
+                the online repository for the spectra prediction. The predictions are done in a structure disjoint \
+                fashion. That means, the pre-trained model for each Massbank spectrum (and its candidates) is chosen \
+                so that the ground truth structure was not part of the training. The similarity between the predicted \
+                and measured MS2 spectra is computed using the modified cosine similarity (matchms Python package, \
+                version 0.9.2). We merged the MS2 spectra for the three (3) collision energies CFM-ID is predicting. \
+                If the measured MassBank entry was available at multiple collision energies (i.e. we have multiple \
+                measured spectra for the same compound), MS2 spectra have been merged using the 'mzClust_hclust' \
+                function from XCMS. The similarity between predicted and measured spectrum was computed on the merged \
+                spectra."
+            ]
 
-            conn_mb.execute(
-                "INSERT OR REPLACE INTO scoring_methods VALUES (?, ?, ?)",
-                (ms2scorer_name, "CFM-ID: 2.0", description)
+            conn.executemany(
+                "INSERT OR IGNORE INTO scoring_methods VALUES (?, ?, ?)",
+                zip(ms2scorer_name, ["CFM-ID: 2.0"] * len(description), description)
             )
 
         # Load the list spectra for which candidate spectra have been predicted
         df = pd.read_csv(os.path.join(args.idir, "spec2model.tsv"), sep="\t")
 
         for idx, (spec_id, _, model_id, ion_mode) in df.iterrows():
-            dataset, precursor_mz = conn_mb.execute(
-                "SELECT dataset, precursor_mz FROM scored_spectra_meta WHERE accession IS ?", (spec_id, )
+            # if idx < 6550:
+            #     continue
+
+            dataset, accession, precursor_mz = conn.execute(
+                "SELECT dataset, accession, precursor_mz FROM scored_spectra_meta WHERE accession IS ?", (spec_id, )
             ).fetchone()
             LOGGER.info(
                 "Process spectrum %05d / %05d: id = %s, dataset = %s" % (idx + 1, len(df), spec_id, dataset)
             )
 
             if args.build_unittest_db \
-                    and not conn_mb.execute("SELECT accession FROM scored_spectra_meta WHERE accession IS ?", (spec_id, )) \
+                    and not conn.execute("SELECT accession FROM scored_spectra_meta WHERE accession IS ?", (spec_id,)) \
                     .fetchall():
                 # In the unittest DB we only include MetFrag scores for spectra that are already in the DB
                 continue
 
             # =======================================================================================
-            # Load the measured spectrum
+            # Load the measured spectrum and score it against the candidates
             with open(os.path.join(
                     args.idir, dataset, "%s.txt" % spec_id
             )) as spec_file:
-                specs_measured = parse_cfm_spectrum(spec_file.readlines(), {"precursor_mz": precursor_mz})
+                # We only use the first energy level. Remember, that we use the same (merged) spectrum from MassBank for
+                # each collision energy anyway.
+                spec_measured = parse_cfm_spectrum(spec_file.readlines(), {"precursor_mz": precursor_mz})[0]
+
+            # Track the candidate scores
+            ikey1s = []
+            scores__summed_up_sim = []
+            scores__merge_pred_spec = []
 
             # Get all molecule IDs of the candidates belonging to the current MB spectrum
-            cur = conn_mb.execute(
-                "SELECT distinct(inchikey1), monoisotopic_mass FROM candidates_spectra "
+            cur = conn.execute(
+                "SELECT inchikey1, monoisotopic_mass FROM candidates_spectra "
                 "   INNER JOIN molecules m on m.cid = candidates_spectra.candidate"
-                "   WHERE spectrum IS ?", (spec_id, )
+                "   WHERE spectrum IS ?"
+                "   GROUP BY inchikey1", (spec_id, )
             )
+
+            _t_load = 0.0
+            _t_merge = 0.0
+            _t_sim_1 = 0.0
+            _t_sim_2 = 0.0
+
             for ikey1, monoisotopic_mass in cur:
                 try:
                     # Load and parse the predicted candidate spectra
+                    s = time.time()
                     with open(os.path.join(
-                        args.idir, "predicted_spectra", "cv=%d__ion=%s" % (model_id, ion_mode), "%s.log" % ikey1
+                            args.idir_pred_spec,
+                            "predicted_spectra",
+                            "cv=%d__ion=%s" % (model_id, ion_mode),
+                            "%s.log" % ikey1
                     )) as spec_file:
                         specs_pred = parse_cfm_spectrum(
                             spec_file.readlines(),
                             {
                                 "precursor_mz": get_precursor_mz(
                                     monoisotopic_mass, "[M+H]+" if ion_mode == "positive" else "[M-H]-"
-                                )
-                            }
+                                ),
+                                "accession": accession
+                            },
+                            return_mbspectrum=True
                         )
+                    _t_load += (time.time() - s)
 
-                    # Compute the spectra similarity
-                    sim = np.mean([
-                        ModifiedCosine().pair(specs_measured[en], normalize_intensities(specs_pred[en])).item()[0]
-                        for en in range(3)
-                    ])
+                    # Compute the spectra similarity (summed up similarity)
+                    s = time.time()
+                    scores__summed_up_sim.append(
+                        np.sum([
+                            ModifiedCosine().pair(
+                                spec_measured,
+                                normalize_intensities(
+                                    Spectrum(
+                                        np.array(spec.get_mz()),
+                                        np.array(spec.get_int()),
+                                        spec.get_meta_information()
+                                    )
+                                )
+                            ).item()[0]
+                            for spec in specs_pred
+                        ])
+                    )
+                    _t_sim_1 += (time.time() - s)
 
+                    # Merge the collision energies of the predicted spectra
+                    s = time.time()
+                    spec_pred = MBSpectrum.merge_spectra(
+                        specs_pred, normalize_peaks_before_merge=False, rt_agg_fun=None
+                    )
+                    _t_merge += (time.time() - s)
 
+                    # Convert the MBSpectrum into a matchms.Spectrum
+                    spec_pred = Spectrum(
+                        np.array(spec_pred.get_mz()), np.array(spec_pred.get_int()), spec_pred.get_meta_information()
+                    )
+
+                    ikey1s.append(ikey1)
+
+                    # Compute the spectra similarity (merged)
+                    s = time.time()
+                    scores__merge_pred_spec.append(ModifiedCosine().pair(spec_measured, spec_pred).item()[0])
+                    _t_sim_2 += (time.time() - s)
                 except FileNotFoundError:
                     LOGGER.warning(
                         "Cannot find predicted spectra for mol=%s, spec=%s, model_id=%d, ion_mode=%s"
                         % (ikey1, spec_id, model_id, ion_mode)
                     )
+                except AssertionError:
+                    LOGGER.warning(
+                        "Something went wrong while parsing the predicted spectrum: %s, %s, %s"
+                        % (ikey1, model_id, ion_mode)
+                    )
+
+            if len(scores__summed_up_sim) == 0:
+                LOGGER.warning("[%s] Empty candidate set." % spec_id)
+                continue
+
+            # Normalize the scores per candidate set
+            scores__summed_up_sim = np.array(scores__summed_up_sim)
+            scores__merge_pred_spec = np.array(scores__merge_pred_spec)
+
+            max_s = np.max(scores__summed_up_sim)
+            if max_s > 0:
+                scores__summed_up_sim /= max_s
+            else:
+                scores__summed_up_sim = np.ones_like(scores__summed_up_sim)
+
+            max_s = np.max(scores__merge_pred_spec)
+            if max_s > 0:
+                scores__merge_pred_spec /= max_s
+            else:
+                scores__merge_pred_spec = np.ones_like(scores__merge_pred_spec)
+
+            cands = pd.DataFrame({
+                "inchikey1": ikey1s,
+                "cfmid_score__summed_up_sim": scores__summed_up_sim.tolist(),
+                "cfmid_score__merge_pred_spec": scores__merge_pred_spec.tolist()
+            })
+
+            LOGGER.debug("Loading the spectra file took: %.4fs" % (_t_load / len(cands)))
+            LOGGER.debug("Computing the spectra similarity took (summed up): %.4fs" % (_t_sim_1 / len(cands)))
+            LOGGER.debug("Merging the spectra took: %.4fs" % (_t_merge / len(cands)))
+            LOGGER.debug("Computing the spectra similarity took (merged): %.4fs" % (_t_sim_2 / len(cands)))
             # =======================================================================================
 
-            # # Open the archive containing the predicted candidate spectra for the current MB spectrum
-            # with tarfile.open(
-            #     os.path.join(args.idir, "predicted_spectra", "cv=%d__ion=%s.tar.gz" % (model_id, ion_mode)),
-            #     mode="r:gz"
-            # ) as pred_cand_spectra_archive:
-            #     for idx, pred_cand_spec in enumerate(pred_cand_spectra_archive):
-            #         print(idx + 1)
-            #
-            #         # The molecule identifier is given by the predicted spectrum's filename
-            #         ikey1 = os.path.basename(pred_cand_spec.name).split(os.extsep)[0]
-            #
-            #         # Consider only the relevant candidate spectra
-            #         if ikey1 not in candidate_set:
-            #             continue
-            #         else:
-            #             print("found")
-            #
-            #         # Read the spectrum
-            #         spec_str = pred_cand_spectra_archive.extractfile(os.extsep.join([ikey1, "log"])).readlines()
-            #         print(spec_str)
-            #
-            #
-            #         # for l in spec_str:
-            #         #     if l.startswith("energy"):
+            # =====================================================================================
+            if len(cands) == 0:
+                LOGGER.warning("[%s] Empty candidate set." % spec_id)
+                continue
+            else:
+                LOGGER.info("[%s] Number of scored candidates (CFM-ID): %d" % (spec_id, len(cands)))
 
+            # Here we add the stereo-isomers for each 2D structure
+            cands = pd.merge(
+                left=cands,
+                right=pd.read_sql(
+                    "SELECT * FROM molecules "
+                    "   WHERE cid in ("
+                    "      SELECT candidate FROM candidates_spectra WHERE spectrum IS '%s')" % spec_id,
+                    con=conn
+                ),
+                on="inchikey1", how="inner"
+            )
+            LOGGER.info("[%s] Number of candidates (with added stereo-configurations): %d" % (spec_id, len(cands)))
 
+            _gt_cid = conn.execute(
+                "SELECT molecule FROM scored_spectra_meta WHERE accession IS ?", (spec_id, )
+            ).fetchone()[0]
 
+            if _gt_cid not in cands["cid"].to_list():
+                LOGGER.error(
+                    "[%s] Correct molecular structure (cid = %d) is not in the candidate set." % (spec_id, _gt_cid)
+                )
+                continue
+            # =====================================================================================
 
+            # ===========================
+            # Insert new data into the DB
+            with conn:
+                # CFM-ID candidate scores (summed up similarities)
+                conn.executemany(
+                    "INSERT INTO spectra_candidate_scores VALUES (?, ?, ?, ?, ?)",
+                    [
+                        (spec_id, row["cid"], ms2scorer_name[0], dataset, row["cfmid_score__summed_up_sim"])
+                        for _, row in cands.iterrows()
+                    ]
+                )
 
-
-
-            # # =====================================================================================
-            # # Load candidates and with MetFrag scores and combine with all stereo-isomers in the DB
-            # with gzip.open(score_fn) as score_file:
-            #     cands = pd.read_csv(score_file)  # type: pd.DataFrame
-            #
-            # with gzip.open(score_fn.replace("csv.gz", "cands.gz")) as original_cands_file:
-            #     orig_cands = pd.read_csv(original_cands_file, sep="|")  # type: pd.DataFrame
-            #
-            # if len(cands) < len(orig_cands):
-            #     LOGGER.warning(
-            #         "[%s] Less candidates with MetFrag score than in the original candidate set: %d < %d" %
-            #         (spec_id, len(cands), len(orig_cands))
-            #     )
-            #
-            # if len(cands) == 0:
-            #     LOGGER.warning("[%s] Empty candidate set." % spec_id)
-            #     continue
-            # else:
-            #     LOGGER.info("[%s] Number of candidates (MetFrag): %d" % (spec_id, len(cands)))
-            #
-            # # Here we add the stereo-isomers for each 2D structure
-            # cands = pd.merge(
-            #     left=cands,
-            #     right=pd.read_sql(
-            #         "SELECT * FROM molecules "
-            #         "   WHERE cid in ("
-            #         "      SELECT candidate FROM candidates_spectra WHERE spectrum IS '%s')" % spec_id,
-            #         con=conn_mb
-            #     ),
-            #     left_on="InChIKey1", right_on="inchikey1", how="inner"
-            # )
-            # LOGGER.info("[%s] Number of candidates (with added stereo-configurations): %d" % (spec_id, len(cands)))
-            #
-            # _gt_cid = conn_mb.execute(
-            #     "SELECT molecule FROM scored_spectra_meta WHERE accession IS ?", (spec_id, )
-            # ).fetchone()[0]
-            #
-            # if _gt_cid not in cands["cid"].to_list():
-            #     LOGGER.error(
-            #         "[%s] Correct molecular structure (cid = %d) is not in the candidate set." % (spec_id, _gt_cid)
-            #     )
-            #     continue
-            # # =====================================================================================
-            #
-            # # ===========================
-            # # Insert new data into the DB
-            # with conn_mb:
-            #     # MetFrag candidate scores
-            #     conn_mb.executemany(
-            #         "INSERT INTO spectra_candidate_scores VALUES (?, ?, ?, ?, ?)",
-            #         [
-            #             (spec_id, row["cid"], ms2scorer_name, dataset, row["FragmenterScore"])
-            #             for _, row in cands.iterrows()
-            #         ]
-            #     )
-            # # ===========================
-
+                # CFM-ID candidate scores (merged predicted spectra)
+                conn.executemany(
+                    "INSERT INTO spectra_candidate_scores VALUES (?, ?, ?, ?, ?)",
+                    [
+                        (spec_id, row["cid"], ms2scorer_name[1], dataset, row["cfmid_score__merge_pred_spec"])
+                        for _, row in cands.iterrows()
+                    ]
+                )
+            # ===========================
     except RuntimeError as err:
         traceback.print_exc()
         LOGGER.error(err)
     finally:
-        conn_mb.close()
+        conn.close()
