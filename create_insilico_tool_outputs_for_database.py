@@ -50,6 +50,9 @@ def write_ms_and_cand_files(ds, n_compounds):
     elif args.output_format == "metfrag__norm_after_merge":
         merge_peak_lists = True
         normalize_peaks_before_merge = False
+    elif args.output_format.lower() == "cfm-id":
+        merge_peak_lists = True
+        normalize_peaks_before_merge = True
     else:
         raise ValueError("Unsupported output format: '%s'" % args.output_format)
 
@@ -58,9 +61,10 @@ def write_ms_and_cand_files(ds, n_compounds):
 
     with MassbankDB(args.massbank_db_fn) as mb_db:
         for idx, (mol, specs, cands) in tqdm.tqdm(enumerate(
-                mb_db.iter_spectra(dataset=ds, grouped=True, return_candidates=args.return_candidates,
-                                   pc_dbfn=args.pubchem_db_fn)),
-                total=n_compounds):
+                mb_db.iter_spectra(
+                    dataset=ds, grouped=True, return_candidates=args.return_candidates, pc_dbfn=args.pubchem_db_fn
+                )
+        ), total=n_compounds):
             # Merge spectra meta-information (e.g. precursor-mz, retention-time) and peaks (if desired) into a single
             # spectrum.
             spec = MBSpectrum.merge_spectra(
@@ -82,6 +86,9 @@ def write_ms_and_cand_files(ds, n_compounds):
                 except UnsupportedPrecursorType as err:
                     print(err)
                     output = {spec.get("accession") + ".failed": str(err)}
+            elif args.output_format.startswith("cfm-id"):
+                # Output in CFM-ID format
+                output = spec.to_cfmid_format(molecular_candidates=cands)
             else:
                 raise ValueError("Unsupported output format: '%s'" % args.output_format)
 
@@ -111,7 +118,7 @@ def parse_cli_arguments():
     arg_parser.add_argument("massbank_db_fn", help="Filepath of the Massbank database.")
     arg_parser.add_argument("output_format",
                             help="Set the output format for the desired In-silico tool, e.g. SIRIUS or MetFrag.",
-                            choices=["sirius", "metfrag", "metfrag__norm_after_merge"])
+                            choices=["sirius", "metfrag", "metfrag__norm_after_merge", "cfm-id"])
     arg_parser.add_argument("odir", help="Path to the output directory.")
 
     arg_parser.add_argument(
