@@ -1,5 +1,17 @@
 # MassBank DB
 
+## "with_cfm_id" (v6, ??.08.2021)
+
+- CFM-ID scores have been added (normalized)
+- We compute the similarity between the predicted and measured spectra 
+  using the modified cosine similarity:
+  1) merge all three (3) predicted energies (their spectra) into one before
+     similarity computation
+  2) compute the similarity for each predicted energy separately and sum up
+     the consine similarities
+
+- TODO: Remove one of the scores depending on their performance.
+
 ## "with_classyfire" (v5, 24.08.2021)
 
 - added the Classyfire molecule class classification for the groud
