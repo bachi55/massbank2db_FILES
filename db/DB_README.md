@@ -1,16 +1,22 @@
 # MassBank DB
 
-## "with_cfm_id" (v6, ??.08.2021)
+## "with_only_stereo_splits" (v8, 08.10.2021)
+
+- added lc-ms data splits where all ground truth molecules in the
+  test sets do have a stereo annotation
+
+## "with_2D_FCFP" (v7, 24.09.2021)
+
+- added FCFP fingerprints (count and binarized) calculated suing the 
+  canonical SMILES strings
+
+## "with_cfm_id" (v6, 24.09.2021)
 
 - CFM-ID scores have been added (normalized)
 - We compute the similarity between the predicted and measured spectra 
   using the modified cosine similarity:
-  1) merge all three (3) predicted energies (their spectra) into one before
-     similarity computation
-  2) compute the similarity for each predicted energy separately and sum up
-     the consine similarities
-
-- TODO: Remove one of the scores depending on their performance.
+  * compute the similarity for each predicted energy separately and sum up
+    the consine similarities
 
 ## "with_classyfire" (v5, 24.08.2021)
 

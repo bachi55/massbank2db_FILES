@@ -35,18 +35,31 @@ if __name__ == "__main__":
     # Read CLI arguments
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument("massbank_db_fn", help="Filepath of the Massbank database.")
+    arg_parser.add_argument("--experiment", default="default", choices=["default", "with_stereo"])
     args = arg_parser.parse_args()
 
-    conn = get_backup_db(args.massbank_db_fn, exists="overwrite", postfix="with_test_splits")
+    conn = get_backup_db(args.massbank_db_fn, exists="reuse", postfix="with_test_splits")
     try:
         # Read accessions
-        df = pd.read_sql(
-            "SELECT accession, dataset FROM scored_spectra_meta"
-            "   INNER JOIN datasets d on scored_spectra_meta.dataset = d.name"
-            "   INNER JOIN molecules m on scored_spectra_meta.molecule = m.cid"
-            "   WHERE retention_time >= 3 * column_dead_time_min",
-            conn
-        )
+        if args.experiment == "default":
+            df = pd.read_sql(
+                "SELECT accession, dataset FROM scored_spectra_meta"
+                "   INNER JOIN datasets d on scored_spectra_meta.dataset = d.name"
+                "   INNER JOIN molecules m on scored_spectra_meta.molecule = m.cid"
+                "   WHERE retention_time >= 3 * column_dead_time_min",
+                conn
+            )
+        elif args.experiment == "with_stereo":
+            df = pd.read_sql(
+                "SELECT accession, dataset FROM scored_spectra_meta"
+                "   INNER JOIN datasets d on scored_spectra_meta.dataset = d.name"
+                "   INNER JOIN molecules m on scored_spectra_meta.molecule = m.cid"
+                "   WHERE retention_time >= 3 * column_dead_time_min"
+                "     AND inchikey2 != 'UHFFFAOYSA'",
+                conn
+            )
+        else:
+            raise ValueError("Invalid experiment: '%s'" % args.experiment)
 
         # Insert a new table that will hold the test set split ids
         with conn:
@@ -57,9 +70,10 @@ if __name__ == "__main__":
                 "   dataset     VARCHAR NOT NULL,"
                 "   accession   VARCHAR NOT NULL,"
                 "   split_id    INTEGER NOT NULL,"
+                "   experiment  VARCHAR NOT NULL,"
                 "   FOREIGN KEY (dataset) references datasets(name),"
                 "   FOREIGN KEY (accession) references scored_spectra_meta(accession),"
-                "   CONSTRAINT unique_lcms_data_split_row UNIQUE (dataset, accession, split_id))"
+                "   CONSTRAINT unique_lcms_data_split_row UNIQUE (dataset, accession, split_id, experiment))"
             )
 
             # Generate LC-MS2 data (random test sets) for each dataset
@@ -69,8 +83,11 @@ if __name__ == "__main__":
                 n_accs = len(accs)
 
                 # SQLite insertion statement
-                stmt = "INSERT OR IGNORE INTO lcms_data_splits VALUES ('%s', ?, ?)" % ds
+                stmt = "INSERT OR IGNORE INTO lcms_data_splits VALUES ('%s', ?, ?, '%s')" % (ds, args.experiment)
 
+                if n_accs < 30:
+                    # We do not add splits that have less than 30 examples
+                    continue
                 if n_accs <= 75:
                     conn.executemany(stmt, zip(accs, [0] * n_accs))
                     continue  # only a single split is needed
