@@ -74,13 +74,14 @@ if __name__ == "__main__":
 
             # Load candidates for current spectrum
             df = pd.read_sql(
-                "SELECT monoisotopic_mass, inchi as InChI, cid, inchikey as InChIKey, molecular_formula, smiles_can"
+                "SELECT monoisotopic_mass, inchi as InChI, cid, inchikey as InChIKey, molecular_formula, smiles_iso"
                 "   FROM (SELECT candidate FROM candidates_spectra WHERE spectrum IS '%s') "
-                "   INNER JOIN molecules ON molecules.cid = candidate "
-                "   GROUP BY inchikey1" % spec_id, conn)
+                "   INNER JOIN molecules ON molecules.cid = candidate"
+                % spec_id, conn
+            )
 
             # Prepare candidates for MetFrag
-            cands = MassbankDB.candidates_to_metfrag_format(df, smiles_column="smiles_can", return_as_str=False)
+            cands = MassbankDB.candidates_to_metfrag_format(df, smiles_column="smiles_iso", return_as_str=False)
 
             # Write candidate lists out (ready to be used by MetFrag)
             ofn = fn.replace(os.extsep + "peaks", os.extsep + "cands")

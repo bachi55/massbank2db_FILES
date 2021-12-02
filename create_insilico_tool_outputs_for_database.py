@@ -44,7 +44,7 @@ def write_ms_and_cand_files(ds, n_compounds):
     if args.output_format.lower() == "sirius":
         merge_peak_lists = False
         normalize_peaks_before_merge = None
-    elif args.output_format == "metfrag":
+    elif args.output_format == "metfrag" or args.output_format == "metfrag__correct_ppm":
         merge_peak_lists = True
         normalize_peaks_before_merge = True
     elif args.output_format == "metfrag__norm_after_merge":
@@ -65,24 +65,45 @@ def write_ms_and_cand_files(ds, n_compounds):
                     dataset=ds, grouped=True, return_candidates=args.return_candidates, pc_dbfn=args.pubchem_db_fn
                 )
         ), total=n_compounds):
+            # Determine the mz error of the MS device by its type
+            if "ITFT" in specs[0].get("instrument_type") or "QFT" in specs[0].get("instrument_type"):
+                mzppm = 5
+                mzabs = 0.001
+            elif "QTOF" in specs[0].get("instrument_type"):
+                mzppm = 20
+                mzabs = 0.001
+            else:
+                mzppm = 5
+                mzabs = 0.001
+
             # Merge spectra meta-information (e.g. precursor-mz, retention-time) and peaks (if desired) into a single
             # spectrum.
             spec = MBSpectrum.merge_spectra(
-                specs, merge_peak_lists=merge_peak_lists, normalize_peaks_before_merge=normalize_peaks_before_merge)
+                specs, merge_peak_lists=merge_peak_lists, normalize_peaks_before_merge=normalize_peaks_before_merge,
+                eabs=mzabs, eppm=mzppm
+            )
 
+            # Generate the tool output
             if args.output_format == "sirius":
                 # Output in SIRIUS (.ms) format
                 output = spec.to_sirius_format(molecular_candidates=cands, add_gt_molecular_formula=True)
             elif args.output_format.startswith("metfrag"):
                 # Output in MetFrag format
                 try:
-                    output = spec.to_metfrag_format(molecular_candidates=cands,
-                                                    **{"MetFragScoreWeights": [1.0],
-                                                       "MetFragScoreTypes": ["FragmenterScore"],
-                                                       "LocalDatabasePath": "./",
-                                                       "ResultsPath": "./",
-                                                       "NumberThreads": 4,
-                                                       "PeakListPath": "./"})
+                    output = spec.to_metfrag_format(
+                        molecular_candidates=cands,
+                        **{
+                            "MetFragScoreWeights": [1.0],
+                            "MetFragScoreTypes": ["FragmenterScore"],
+                            "LocalDatabasePath": "./",
+                            "ResultsPath": "./",
+                            "NumberThreads": 4,
+                            "PeakListPath": "./",
+                            "FragmentPeakMatchAbsoluteMassDeviation": mzabs,
+                            "FragmentPeakMatchRelativeMassDeviation": mzppm,
+                            "UseSmiles": True
+                        }
+                    )
                 except UnsupportedPrecursorType as err:
                     print(err)
                     output = {spec.get("accession") + ".failed": str(err)}
@@ -116,9 +137,11 @@ def write_ms_and_cand_files(ds, n_compounds):
 def parse_cli_arguments():
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument("massbank_db_fn", help="Filepath of the Massbank database.")
-    arg_parser.add_argument("output_format",
-                            help="Set the output format for the desired In-silico tool, e.g. SIRIUS or MetFrag.",
-                            choices=["sirius", "metfrag", "metfrag__norm_after_merge", "cfm-id"])
+    arg_parser.add_argument(
+        "output_format",
+        help="Set the output format for the desired In-silico tool, e.g. SIRIUS or MetFrag.",
+        choices=["sirius", "metfrag", "metfrag__norm_after_merge", "cfm-id", "metfrag__correct_ppm"]
+    )
     arg_parser.add_argument("odir", help="Path to the output directory.")
 
     arg_parser.add_argument(
@@ -148,7 +171,7 @@ if __name__ == "__main__":
 
     # Get list of all dataset in the DB
     con = sqlite3.connect(args.massbank_db_fn)
-    ds_ncmp = con.execute("SELECT name, num_compounds FROM datasets").fetchall()
+    ds_ncmp = con.execute("SELECT name, num_compounds FROM datasets ORDER BY name").fetchall()
     con.close()
 
     # Process the datasets

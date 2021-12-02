@@ -128,23 +128,15 @@ if __name__ == "__main__":
         default=2**14,
         help="Size of the batches in which the descriptors are computed and inserted to the DB."
     )
-    arg_parser.add_argument(
-        "--n_jobs",
-        type=int,
-        default=4
-    )
-    arg_parser.add_argument(
-        "--molecule_representation",
-        type=str,
-        default="smiles_can",
-        choices=["smiles_can", "smiles_iso"]
-    )
+    arg_parser.add_argument("--n_jobs", type=int, default=4)
+    arg_parser.add_argument("--molecule_representation", type=str, default="smiles_iso", choices=["smiles_iso"])
     arg_parser.add_argument(
         "--backup_db_exists", type=str, default="overwrite", choices=["overwrite", "raise", "reuse"]
     )
     args = arg_parser.parse_args()
 
     # Open connection to database
+    # conn = sqlite3.connect(args.massbank_db_fn)
     conn = get_backup_db(args.massbank_db_fn, exists=args.backup_db_exists, postfix="with_descriptors")
     try:
         with conn:
