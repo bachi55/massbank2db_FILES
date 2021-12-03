@@ -148,7 +148,7 @@ def parse_cli_arguments():
         "--pubchem_db_fn",
         default="/home/bach/Documents/doctoral/projects/local_pubchem_db/db_files/pubchem_01-02-2021.sqlite",
         type=str,
-        help="Filepath of the PubChem database.")
+        help="Filepath of the PubChem database. Only needed if candidate sets are requested.")
     arg_parser.add_argument(
         "--datasets",
         nargs="*",

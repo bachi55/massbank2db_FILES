@@ -39,11 +39,11 @@ from massbank2db.db import MassbankDB
 # ================
 # Setup the Logger
 LOGGER = logging.getLogger("Import CSI:FingerID Scores")
-LOGGER.setLevel(logging.INFO)
+LOGGER.setLevel(logging.WARNING)
 LOGGER.propagate = False
 
 CH = logging.StreamHandler()
-CH.setLevel(logging.INFO)
+CH.setLevel(logging.WARNING)
 
 FORMATTER = logging.Formatter('[%(levelname)s] %(name)s : %(message)s')
 CH.setFormatter(FORMATTER)
@@ -52,6 +52,7 @@ LOGGER.addHandler(CH)
 # ================
 
 DISCONNECTED_PATTER = re.compile(r"^[0-9]+.*")
+PREDIX_PATTERN = re.compile(r"[A-Z]{2,3}")
 
 
 def create_tables(conn: sqlite3.Connection):
@@ -63,20 +64,20 @@ def create_tables(conn: sqlite3.Connection):
                  "  precursor_type      VARCHAR NOT NULL,"
                  "  molecule            INTEGER NOT NULL,"
                  "  retention_time      REAL NOT NULL,"
-                 "  FOREIGN KEY (molecule) REFERENCES molecules(cid),"
-                 "  FOREIGN KEY (dataset) REFERENCES datasets(name))")
+                 "  FOREIGN KEY (molecule) REFERENCES molecules(cid) ON DELETE CASCADE,"
+                 "  FOREIGN KEY (dataset) REFERENCES datasets(name) ON DELETE CASCADE)")
 
     conn.execute("CREATE TABLE IF NOT EXISTS candidates_spectra ("
                  "  spectrum        VARCHAR NOT NULL,"
                  "  candidate       INT NOT NULL,"
-                 "  FOREIGN KEY (candidate) REFERENCES molecules(cid),"
+                 "  FOREIGN KEY (candidate) REFERENCES molecules(cid) ON DELETE CASCADE,"
                  "  FOREIGN KEY (spectrum) REFERENCES scored_spectra_meta(accession) ON DELETE CASCADE,"
                  "  CONSTRAINT spectrum_candidate_combination UNIQUE (spectrum, candidate))")
 
     conn.execute("CREATE TABLE IF NOT EXISTS merged_accessions ("
                  "  massbank_accession  VARCHAR PRIMARY KEY,"
                  "  merged_accession    VARCHAR NOT NULL,"
-                 "  FOREIGN KEY (massbank_accession) REFERENCES spectra_meta (accession),"
+                 "  FOREIGN KEY (massbank_accession) REFERENCES spectra_meta (accession) ON DELETE CASCADE,"
                  "  FOREIGN KEY (merged_accession) REFERENCES scored_spectra_meta(accession) ON DELETE CASCADE)")
 
     conn.execute("CREATE TABLE IF NOT EXISTS scoring_methods ("
@@ -91,9 +92,9 @@ def create_tables(conn: sqlite3.Connection):
                  "  dataset         VARCHAR NOT NULL,"
                  "  score           REAL NOT NULL,"
                  "  FOREIGN KEY (spectrum) REFERENCES scored_spectra_meta(accession) ON DELETE CASCADE,"
-                 "  FOREIGN KEY (candidate) REFERENCES molecules(cid),"
-                 "  FOREIGN KEY (dataset) REFERENCES datasets(name),"
-                 "  FOREIGN KEY (scoring_method) REFERENCES scoring_methods(name),"
+                 "  FOREIGN KEY (candidate) REFERENCES molecules(cid) ON DELETE CASCADE,"
+                 "  FOREIGN KEY (dataset) REFERENCES datasets(name) ON DELETE CASCADE,"
+                 "  FOREIGN KEY (scoring_method) REFERENCES scoring_methods(name) ON DELETE CASCADE,"
                  "  PRIMARY KEY (spectrum, candidate, scoring_method))")
 
     conn.execute("CREATE TABLE IF NOT EXISTS fingerprints_meta ("
@@ -109,11 +110,12 @@ def create_tables(conn: sqlite3.Connection):
                  "  max_values  VARCHAR,"
                  "  CONSTRAINT type_mode_combination UNIQUE (type, mode, param))")
 
-    conn.execute("CREATE TABLE IF NOT EXISTS fingerprints_data__sirius_fps ("
-                 "  molecule    INTEGER NOT NULL PRIMARY KEY,"
-                 "  bits        VARCHAR NOT NULL,"
-                 "  vals        VARCHAR,"
-                 "  FOREIGN KEY (molecule) REFERENCES molecules(cid))")
+    if args.include_sirius_fps:
+        conn.execute("CREATE TABLE IF NOT EXISTS fingerprints_data__sirius_fps ("
+                     "  molecule    INTEGER NOT NULL PRIMARY KEY,"
+                     "  bits        VARCHAR NOT NULL,"
+                     "  vals        VARCHAR,"
+                     "  FOREIGN KEY (molecule) REFERENCES molecules(cid) ON DELETE CASCADE)")
 
 
 def create_indices(conn: sqlite3.Connection):
@@ -126,7 +128,8 @@ def create_indices(conn: sqlite3.Connection):
 
     conn.execute("CREATE INDEX IF NOT EXISTS cs__spectrum ON candidates_spectra(spectrum)")
 
-    conn.execute("CREATE INDEX IF NOT EXISTS fpd__molecule__sirius_fps ON fingerprints_data__sirius_fps(molecule)")
+    if args.include_sirius_fps:
+        conn.execute("CREATE INDEX IF NOT EXISTS fpd__molecule__sirius_fps ON fingerprints_data__sirius_fps(molecule)")
 
 
 if __name__ == "__main__":
@@ -146,6 +149,17 @@ if __name__ == "__main__":
         "--build_unittest_db",
         action="store_true",
         help="Use this option to create a smaller database (subset of SIRIUS scores) that we can use for unittests."
+    )
+    arg_parser.add_argument(
+        "--include_sirius_fps",
+        action="store_true",
+        help="Should SIRIUS fingerprints be added to the database"
+    )
+    arg_parser.add_argument(
+        "--acc_to_be_removed_fn",
+        type=str,
+        help="List of grouped accession ids to be removed.",
+        default="./grouped_accessions_to_be_removed.txt"
     )
     args = arg_parser.parse_args()
 
@@ -167,7 +181,9 @@ if __name__ == "__main__":
 
     conn_pc = sqlite3.connect(args.pubchem_db_fn)
 
-    prefix_pattern = re.compile(r"[A-Z]{2,3}")
+    # Load the grouped accession IDs which should be removed.
+    with open(args.acc_to_be_removed_fn, "r") as acc_to_be_removed_file:
+        acc_to_be_removed = set(l.strip() for l in acc_to_be_removed_file.readlines())
 
     try:
         with conn_mb:
@@ -176,16 +192,17 @@ if __name__ == "__main__":
         with conn_mb:
             create_tables(conn_mb)
 
-            conn_mb.execute("INSERT OR REPLACE INTO fingerprints_meta "
-                            "   VALUES (?, ?, ?, ?, DATETIME('now', 'localtime'), ?, ?, ?, ?, ?)",
-                            ("sirius_fps", "UNION", "binary", None, "CDK: None", 3047, False, None, None))
+            if args.include_sirius_fps:
+                conn_mb.execute("INSERT OR REPLACE INTO fingerprints_meta "
+                                "   VALUES (?, ?, ?, ?, DATETIME('now', 'localtime'), ?, ?, ?, ?, ?)",
+                                ("sirius_fps", "UNION", "binary", None, "CDK: None", 3047, False, None, None))
 
             conn_mb.execute("INSERT OR REPLACE INTO scoring_methods VALUES (?, ?, ?)",
-                            ("sirius__sd__correct_mf", "SIRIUS: 4, CSI:FingerID: 1.4.5",
+                            ("sirius__sd__correct_mf__norm", "SIRIUS: 4, CSI:FingerID: 1.4.5",
                              "Dr. Kai Dührkop ran CSI:FingerID to predict the candidate scores in a structure disjoint "
                              "(sd) fashion. That means, the ground truth molecular structured associated with the "
                              "Massbank spectra have not been used for training. The correct molecular formula was used "
-                             "to construct the candidate sets."))
+                             "to construct the candidate sets. The scores are normalized to range [0, 1]."))
 
         spectra_idx = 0
         with tarfile.open(os.path.join(args.idir, args.score_tgz_fn), "r:gz") as score_archive:
@@ -194,7 +211,11 @@ if __name__ == "__main__":
                     # Found a spectrum ...
                     spectra_idx += 1
                     spec_id = os.path.basename(entry.name).split(os.path.extsep)[0]  # e.g. AC01111385
-                    LOGGER.info("Process spectrum %05d: id = %s" % (spectra_idx, spec_id))
+                    LOGGER.info("Process spectrum %05d: id = %s (out of 8537)" % (spectra_idx, spec_id))
+
+                    if spec_id in acc_to_be_removed:
+                        LOGGER.warning("We remove id = '%s'. See pull request #152 in the MassBank repository.")
+                        continue
 
                     # For unittest DBs we only import a sub-set of the spectra
                     if args.build_unittest_db and np.random.RandomState(spectra_idx).rand() > 0.005:
@@ -204,7 +225,7 @@ if __name__ == "__main__":
                     # Find meta-information for spectrum
                     meta_info = None
 
-                    ds_pref = re.findall(prefix_pattern, spec_id)[0]  # e.g. AC
+                    ds_pref = re.findall(PREDIX_PATTERN, spec_id)[0]  # e.g. AC
                     for d in glob.iglob(os.path.join(args.idir, "%s*" % ds_pref)):
                         _df = pd.read_csv(os.path.join(d, "spectra_summary.tsv"), sep="\t")
                         try:
@@ -244,13 +265,15 @@ if __name__ == "__main__":
                     # Filter candidates: Implemented as done in the MetFrag software
                     is_not_isotopic = cands["InChI"].apply(lambda x: "/i" not in x)  # isotopic
 
-                    is_connected = cands["molecular_formula"].apply(
+                    is_connected_mf = cands["molecular_formula"].apply(
                         lambda x: ("." not in x) and (DISCONNECTED_PATTER.match(x) is None))  # disconnected
 
-                    cands = cands[is_not_isotopic & is_connected]
+                    is_connected_smiles = cands["SMILES_ISO"].apply(lambda x: "." not in x)
+
+                    cands = cands[is_not_isotopic & is_connected_mf & is_connected_smiles]
 
                     LOGGER.info("[%s] Filtering removed %d candidates." %
-                                (spec_id, (~ (is_not_isotopic & is_connected)).sum()))
+                                (spec_id, (~ (is_not_isotopic & is_connected_mf & is_connected_smiles)).sum()))
                     # --------------------------------------------------------------
 
                     if meta_info["pubchem_id"] not in cands["cid"].to_list():
@@ -298,12 +321,31 @@ if __name__ == "__main__":
                                                 (meta_info["accession"], row["cid"]) for _, row in cands.iterrows()
                                             ])
 
-                        # CSI:FingerID candidate scores
+                        # CSI:FingerID candidate scores (normalize first)
+
+                        # Make all scores >= 0 by adding the absolute value for the smallest score
+                        cands["score"] += np.abs(np.min(cands["score"]))
+
+                        # Make maximum score being 1
+                        _max_score = np.max(cands["score"])
+                        if _max_score == 0:
+                            LOGGER.warning("[%s] Max score zero ?" % spec_id)
+                            LOGGER.warning(cands["score"])
+
+                            cands["score"] = np.ones_like(cands["score"])
+                        else:
+                            cands["score"] /= _max_score
+
                         conn_mb.executemany(
                             "INSERT INTO spectra_candidate_scores VALUES (?, ?, ?, ?, ?)",
                             [
-                                (meta_info["accession"], row["cid"], "sirius__sd__correct_mf", meta_info["dataset"],
-                                 row["score"])
+                                (
+                                    meta_info["accession"],
+                                    row["cid"],
+                                    "sirius__sd__correct_mf__norm",
+                                    meta_info["dataset"],
+                                    row["score"]
+                                )
                                 for _, row in cands.iterrows()
                             ]
                         )
@@ -316,16 +358,17 @@ if __name__ == "__main__":
                                             ])
 
                         # CSI:FingerID fingerprints as index strings
-                        conn_mb.executemany(
-                            "INSERT OR IGNORE INTO fingerprints_data__sirius_fps(molecule, bits) VALUES (?, ?)",
-                            [
-                                (
-                                    row["cid"],
-                                    ",".join(map(str, [idx for idx, fp in enumerate(row["fingerprint"]) if fp == "1"]))
-                                )
-                                for _, row in cands.iterrows()
-                            ]
-                        )
+                        if args.include_sirius_fps:
+                            conn_mb.executemany(
+                                "INSERT OR IGNORE INTO fingerprints_data__sirius_fps(molecule, bits) VALUES (?, ?)",
+                                [
+                                    (
+                                        row["cid"],
+                                        ",".join(map(str, [idx for idx, fp in enumerate(row["fingerprint"]) if fp == "1"]))
+                                    )
+                                    for _, row in cands.iterrows()
+                                ]
+                            )
                     # ===========================
 
         with conn_mb:
