@@ -70,22 +70,19 @@ if __name__ == "__main__":
 
         with conn_mb:
             ms2scorer_name = os.path.split(args.idir.rstrip(os.path.sep))[-1]  # e.g. tool_output/metfrag/ --> metfrag
-            if ms2scorer_name == "metfrag":
+            if ms2scorer_name == "metfrag__correct_ppm":
                 description = "The MetFrag software (in version 2.4.5) was used to calculate in-silico MS2 scores for " \
-                              "predefined candidate sets. The 'FragmenterScore' was used as MS2 score, abs. mass dev. " \
-                              "was set to 0.0001, rel. mass dev. was set to 5, and the maximimum tree depth was 2. If " \
-                              "multiple collision energies where available, the corresponding normalized (maximum " \
+                              "predefined candidate sets. The normalized (max = 1) 'FragmenterScore' was used as MS2 score. " \
+                              "The abs. mass dev. was set to 0.0001, rel. mass dev. was set to 5 (QTOF & ITFT) or 20 (ORBITRAP), and the " \
+                              "maximimum tree depth was 2. If multiple collision energies where available, the corresponding normalized (maximum " \
                               "intensity equals 100) MS2 spectra have been merged using the 'mzClust_hclust' function " \
                               "from XCMS."
-            elif ms2scorer_name == "metfrag__norm_after_merge":
-                description = "The MetFrag software (in version 2.4.5) was used to calculate in-silico MS2 scores for " \
-                              "predefined candidate sets. The 'FragmenterScore' was used as MS2 score, abs. mass dev. " \
-                              "was set to 0.0001, rel. mass dev. was set to 5, and the maximimum tree depth was 2. If " \
-                              "multiple collision energies where available, the corresponding MS2 spectra have been " \
-                              "merged using the 'mzClust_hclust' function from XCMS. Spectra normalization was performed " \
-                              "after the merging."
             else:
                 raise ValueError("Invalid MetFrag input directory: '%s'.")
+
+            # Normalize scorer name
+            ms2scorer_name = ms2scorer_name.split("__")[0] + "__norm"
+            LOGGER.info("New scorer name: %s" % ms2scorer_name)
 
             conn_mb.execute(
                 "INSERT OR REPLACE INTO scoring_methods VALUES (?, ?, ?)",
@@ -128,24 +125,11 @@ if __name__ == "__main__":
             else:
                 LOGGER.info("[%s] Number of candidates (MetFrag): %d" % (spec_id, len(cands)))
 
-            # Here we add the stereo-isomers for each 2D structure
-            cands = pd.merge(
-                left=cands,
-                right=pd.read_sql(
-                    "SELECT * FROM molecules "
-                    "   WHERE cid in ("
-                    "      SELECT candidate FROM candidates_spectra WHERE spectrum IS '%s')" % spec_id,
-                    con=conn_mb
-                ),
-                left_on="InChIKey1", right_on="inchikey1", how="inner"
-            )
-            LOGGER.info("[%s] Number of candidates (with added stereo-configurations): %d" % (spec_id, len(cands)))
-
             _gt_cid = conn_mb.execute(
                 "SELECT molecule FROM scored_spectra_meta WHERE accession IS ?", (spec_id, )
             ).fetchone()[0]
 
-            if _gt_cid not in cands["cid"].to_list():
+            if _gt_cid not in cands["Identifier"].to_list():
                 LOGGER.error(
                     "[%s] Correct molecular structure (cid = %d) is not in the candidate set." % (spec_id, _gt_cid)
                 )
@@ -159,8 +143,7 @@ if __name__ == "__main__":
                 conn_mb.executemany(
                     "INSERT INTO spectra_candidate_scores VALUES (?, ?, ?, ?, ?)",
                     [
-                        (spec_id, row["cid"], ms2scorer_name, dataset, row["FragmenterScore"])
-                        for _, row in cands.iterrows()
+                        (spec_id, row["Identifier"], ms2scorer_name, dataset, row["Score"]) for _, row in cands.iterrows()
                     ]
                 )
             # ===========================

@@ -34,7 +34,6 @@ from rdkit import __version__ as rdkit_version
 from rosvm.feature_extraction.featurizer_cls import CircularFPFeaturizer
 from rosvm import __version__ as rosvm_version
 
-
 # ================
 # Setup the Logger
 LOGGER = logging.getLogger("Compute Circular Fingerprints")
@@ -86,11 +85,11 @@ if __name__ == "__main__":
                             default="all")
     arg_parser.add_argument("--batch_size", type=int, default=2**14,
                             help="Size of the batches in which the fingerprints are computed and inserted to the DB.")
-    arg_parser.add_argument("--molecule_representation", type=str, default="smiles_iso",
-                            choices=["smiles_can", "smiles_iso"])
+    arg_parser.add_argument("--molecule_representation", type=str, default="smiles_iso", choices=["smiles_iso"])
     arg_parser.add_argument("--radius", default=2)
+    arg_parser.add_argument("--use_chirality", action="store_true")
     arg_parser.add_argument("--n_candidates_for_training", type=int, default=50000)
-    arg_parser.add_argument("--min_subs_freq", type=int, default=50)
+    arg_parser.add_argument("--min_subs_freq", type=int, default=75)
     args = arg_parser.parse_args()
 
     # Open connection to database
@@ -100,20 +99,32 @@ if __name__ == "__main__":
         with conn:
             conn.execute("PRAGMA foreign_keys = ON")
 
+        tmp, = conn.execute(
+            "SELECT param FROM fingerprints_meta WHERE name IS '%s__count__all__3D'" % args.fp_type
+        ).fetchone()
+        cids_to_load = tmp.split(",")[-1].split(":")[-1].split(";")
+        rows = conn.execute(
+            "SELECT cid, %s FROM molecules WHERE cid in %s" %
+            (
+                args.molecule_representation,
+                "(" + ",".join(cids_to_load) + ")"
+            )
+        ).fetchall()
+
         # Load the SMILES used to train the frequent circular fingerprint hashes
-        rows = []
-
-        if args.key_training_set in ["random_candidates", "all"]:
-            rows += conn.execute(
-                "SELECT cid, %s FROM molecules ORDER BY random() LIMIT %d" %
-                (args.molecule_representation, args.n_candidates_for_training)
-            ).fetchall()
-
-        if args.key_training_set in ["gt_structures", "all"]:
-            rows += conn.execute(
-                "SELECT cid, m.%s FROM scored_spectra_meta "
-                "   INNER JOIN molecules m on scored_spectra_meta.molecule = m.cid" % args.molecule_representation
-            ).fetchall()
+        # rows = []
+        #
+        # if args.key_training_set in ["random_candidates", "all"]:
+        #     rows += conn.execute(
+        #         "SELECT cid, %s FROM molecules ORDER BY random() LIMIT %d" %
+        #         (args.molecule_representation, args.n_candidates_for_training)
+        #     ).fetchall()
+        #
+        # if args.key_training_set in ["gt_structures", "all"]:
+        #     rows += conn.execute(
+        #         "SELECT cid, m.%s FROM scored_spectra_meta "
+        #         "   INNER JOIN molecules m on scored_spectra_meta.molecule = m.cid" % args.molecule_representation
+        #     ).fetchall()
 
         LOGGER.info("Number of SMILES used for training (%s): %d." % (args.key_training_set, len(rows)))
 
@@ -121,13 +132,14 @@ if __name__ == "__main__":
         cids_train, smis_train = zip(*rows)
         fprinter = CircularFPFeaturizer(
             fp_type=args.fp_type, only_freq_subs=True, min_subs_freq=args.min_subs_freq, n_jobs=args.n_jobs,
-            radius=args.radius, use_chirality=True, output_format="dense"
+            radius=args.radius, use_chirality=args.use_chirality, output_format="dense"
         ).fit(list(smis_train))
         LOGGER.info("Size of frequent hash set: %d" % len(fprinter))
 
         # Insert fingerprint meta-data
         with conn:
             name, fp_type, fp_mode, param, library, length, is_folded, hash_keys = get_fp_meta_data(fprinter)
+            name += "__2D"
             param += ", cids: %s" % ";".join(map(str, cids_train))
 
             conn.execute(

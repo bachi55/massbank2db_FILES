@@ -204,10 +204,10 @@ if __name__ == "__main__":
 
             # Get all molecule IDs of the candidates belonging to the current MB spectrum
             cur = conn.execute(
-                "SELECT inchikey1, monoisotopic_mass FROM candidates_spectra "
+                "SELECT inchikey, monoisotopic_mass FROM candidates_spectra "
                 "   INNER JOIN molecules m on m.cid = candidates_spectra.candidate"
-                "   WHERE spectrum IS ?"
-                "   GROUP BY inchikey1", (spec_id, )
+                "   WHERE spectrum IS ?",
+                (spec_id, )
             )
 
             _t_load = 0.0
@@ -215,7 +215,7 @@ if __name__ == "__main__":
             _t_sim_1 = 0.0
             _t_sim_2 = 0.0
 
-            for ikey1, monoisotopic_mass in cur:
+            for ikey, monoisotopic_mass in cur:
                 try:
                     # Load and parse the predicted candidate spectra
                     s = time.time()
@@ -223,7 +223,7 @@ if __name__ == "__main__":
                             args.idir_pred_spec,
                             "predicted_spectra",
                             "cv=%d__ion=%s" % (model_id, ion_mode),
-                            "%s.log" % ikey1
+                            "%s.log" % ikey
                     )) as spec_file:
                         specs_pred = parse_cfm_spectrum(
                             spec_file.readlines(),
@@ -268,7 +268,7 @@ if __name__ == "__main__":
                         np.array(spec_pred.get_mz()), np.array(spec_pred.get_int()), spec_pred.get_meta_information()
                     )
 
-                    ikey1s.append(ikey1)
+                    ikey1s.append(ikey)
 
                     # Compute the spectra similarity (merged)
                     s = time.time()
@@ -277,12 +277,12 @@ if __name__ == "__main__":
                 except FileNotFoundError:
                     LOGGER.warning(
                         "Cannot find predicted spectra for mol=%s, spec=%s, model_id=%d, ion_mode=%s"
-                        % (ikey1, spec_id, model_id, ion_mode)
+                        % (ikey, spec_id, model_id, ion_mode)
                     )
                 except AssertionError:
                     LOGGER.warning(
                         "Something went wrong while parsing the predicted spectrum: %s, %s, %s"
-                        % (ikey1, model_id, ion_mode)
+                        % (ikey, model_id, ion_mode)
                     )
 
             if len(scores__summed_up_sim) == 0:

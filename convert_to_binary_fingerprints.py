@@ -83,10 +83,10 @@ if __name__ == "__main__":
         # ----------------------------
         # Insert fingerprint meta-data
         # ----------------------------
-        fp_name_old = "__".join([args.fp_type, "count", args.key_training_set])
+        fp_name_old = "__".join([args.fp_type, "count", args.key_training_set, "2D"])
         fp_name_new = fp_name_old.replace("count", "binary")
 
-        # 1) Load counting meta-data
+        # 1) Load counting meta-dataq1
         params, library, max_values, d_old = conn.execute(
             "SELECT param, library, max_values, length FROM main.fingerprints_meta WHERE name IS ?", (fp_name_old, )
         ).fetchone()
@@ -119,7 +119,7 @@ if __name__ == "__main__":
         trans = CountingFpsBinarizer(bin_centers=[np.arange(int(mv)) + 1 for mv in max_values.split(",")])
 
         n_mols_total = conn.execute("SELECT count(*) FROM molecules").fetchone()[0]
-        rows = conn.execute("SELECT molecule, bits, vals FROM fingerprints_data WHERE name IS ?", (fp_name_old, ))
+        rows = conn.execute("SELECT molecule, bits, vals FROM fingerprints_data__%s" % fp_name_old)
 
         n_mols_processed = 0
         while res := rows.fetchmany(args.batch_size):

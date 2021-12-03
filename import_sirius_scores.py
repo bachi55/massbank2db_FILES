@@ -260,7 +260,7 @@ if __name__ == "__main__":
 
                     _unq_mf = cands["molecular_formula"].unique()
                     if meta_info["molecular_formula"] not in _unq_mf:
-                        LOGGER.error("[{}] Correct molecular formula is not on the candidate set: {} not in {}."
+                        LOGGER.error("[{}] Correct molecular formula is not in the candidate set: {} not in {}."
                                      .format(spec_id, meta_info["molecular_formula"], _unq_mf))
                         continue
 
